@@ -43,7 +43,7 @@ function guardarReciente(id, providerID, variant) {
   }
 }
 
-function rutaAFileUri(rutaAbsoluta) {
+export function rutaAFileUri(rutaAbsoluta) {
   /* Formato verificado contra el servidor: file:///C:/ruta/con/barras
      (Windows). En macOS/Linux la ruta ya empieza por "/", asi que sale
      file:///Users/... correctamente. encodeURI codifica espacios y demas. */
@@ -377,13 +377,13 @@ export function crearControles({ sessionID, onArchivos }) {
   };
 }
 
-/* ---- utilidades de rutas ---- */
-function nombreDe(p) {
+/* ---- utilidades de rutas (exportadas para los tests) ---- */
+export function nombreDe(p) {
   const s = String(p).replace(/[\\/]+$/, "");
   const i = Math.max(s.lastIndexOf("\\"), s.lastIndexOf("/"));
   return i === -1 ? s : s.slice(i + 1);
 }
-function dirPadre(p) {
+export function dirPadre(p) {
   const s = String(p).replace(/[\\/]+$/, "");
   const i = Math.max(s.lastIndexOf("\\"), s.lastIndexOf("/"));
   return i <= 2 ? s : s.slice(0, i);
@@ -397,11 +397,15 @@ function dirPadre(p) {
    el mismo en la reconstruccion, para que funcione con servidores Windows,
    macOS y Linux. */
 let homeCache = "";
-function separadorDe(ruta) {
+/* los tests necesitan reiniciar la cache entre casos */
+export function resetHomeCache() {
+  homeCache = "";
+}
+export function separadorDe(ruta) {
   const s = String(ruta || "");
   return s.includes("\\") ? "\\" : "/";
 }
-function deducirHome(rutaPedida, entradas) {
+export function deducirHome(rutaPedida, entradas) {
   if (homeCache) return homeCache;
   const sep = separadorDe(rutaPedida);
   const norm = (s) => {
@@ -433,7 +437,7 @@ function deducirHome(rutaPedida, entradas) {
   return "";
 }
 /* reconstruye la absoluta de una entrada a partir del home deducido */
-function absoluta(home, p) {
+export function absoluta(home, p) {
   const s = String(p).replace(/[\\/]+$/, "");
   if (/^[A-Za-z]:/.test(s) || s.startsWith("/")) return s; // ya es absoluta
   const sep = separadorDe(home || p);

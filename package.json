@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "test": "node --test \"test/**/*.test.js\""
   },
   "devDependencies": {
     "qrcode": "^1.5.4",
