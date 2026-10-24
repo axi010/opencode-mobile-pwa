@@ -245,6 +245,11 @@ mark.resaltado.activa {
   border-radius: var(--radius);
   overflow-wrap: anywhere;
 }
+/* Modo compacto (Ajustes -> Apariencia): mas mensajes en pantalla */
+body.compacto .bubble { padding: 6px 10px; font-size: 0.88rem; }
+body.compacto .chat-scroll { gap: 6px; padding: 10px 10px; }
+body.compacto .note { font-size: 0.7rem; }
+body.compacto .tool { font-size: 0.68rem; }
 .bubble.user {
   align-self: flex-end;
   background: var(--accent);
@@ -471,6 +476,22 @@ select:focus { outline: none; border-color: var(--accent); }
   background: var(--bg3);
 }
 .pin-box { display: flex; flex-direction: column; gap: 10px; }
+.fila-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding-top: 4px;
+}
+.fila-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+  padding: 0;
+}
 .pasos {
   margin: 0;
   padding-left: 20px;

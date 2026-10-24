@@ -214,7 +214,21 @@ export async function settingsView(_params, root, _signal) {
   main.append(
     h("section", { class: "sec" }, h("h3", {}, "Apariencia"),
       h("p", { class: "hint" }, "«Auto» sigue el modo claro/oscuro del sistema."),
-      h("div", { class: "seg", role: "group", "aria-label": "Tema" }, ...botonesTema))
+      h("div", { class: "seg", role: "group", "aria-label": "Tema" }, ...botonesTema),
+      h("label", { class: "fila-toggle" },
+        h("input", {
+          type: "checkbox",
+          checked: localStorage.getItem("ocmovil.compacto") === "1" ? true : false,
+          onChange: (e) => {
+            try {
+              localStorage.setItem("ocmovil.compacto", e.target.checked ? "1" : "0");
+            } catch {
+              /* best-effort */
+            }
+            document.body.classList.toggle("compacto", e.target.checked);
+          },
+        }),
+        "Modo compacto (más mensajes en pantalla)"))
   );
 
   /* ================= NOTIFICACIONES ================= */

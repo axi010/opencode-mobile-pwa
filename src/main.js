@@ -39,8 +39,17 @@ if (forzarSetup) {
   location.hash = isConfigured() ? "#/sessions" : "#/setup";
 }
 
-// Tema ANTES de arrancar el router (la app pinta tras el JS: sin parpadeo).
+/* Tema ANTES de arrancar el router (la app pinta tras el JS: sin parpadeo). */
 initTheme();
+
+// Modo compacto del chat (preferencia de apariencia persistida).
+try {
+  if (localStorage.getItem("ocmovil.compacto") === "1") {
+    document.body.classList.add("compacto");
+  }
+} catch {
+  /* best-effort */
+}
 
 // Con PIN activo: NO arrancar la app hasta desbloquear (mientras tanto no
 // hay peticiones ni datos en pantalla). Sin PIN resuelve al vuelo.
