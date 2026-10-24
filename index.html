@@ -23,8 +23,11 @@
     <title>OpenCode Móvil</title>
   </head>
   <body>
-    <div id="app" aria-live="polite"></div>
-    <div id="toast" hidden></div>
+    <!-- aria-live va SOLO en el toast: si se pone en #app, el lector de pantalla
+         lee cada repintado de la vista entera (ruido). El chat tiene su propio
+         anuncio acotado. -->
+    <div id="app"></div>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

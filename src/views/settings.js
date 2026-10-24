@@ -39,7 +39,7 @@ export async function settingsView(_params, root, _signal) {
     h(
       "header",
       { class: "topbar" },
-      h("button", { class: "icon-btn", title: t("Volver"), onClick: () => navigate("/sessions") }, "‹"),
+      h("button", { class: "icon-btn", title: t("Volver"), "aria-label": t("Volver"), onClick: () => navigate("/sessions") }, "‹"),
       h("h1", {}, t("Ajustes"))
     )
   );
@@ -93,12 +93,12 @@ export async function settingsView(_params, root, _signal) {
   pintarConexion();
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, t("Conexión")), kvUrl, kvAlt, kvModo, kvVer,
+    h("section", { class: "sec" }, h("h2", {}, t("Conexión")), kvUrl, kvAlt, kvModo, kvVer,
       h("div", { class: "btn-row" }, probarBtn, cambiarBtn, swapBtn))
   );
 
   /* ================= SEGURIDAD ================= */
-  const secSeg = h("section", { class: "sec" }, h("h3", {}, t("Seguridad")));
+  const secSeg = h("section", { class: "sec" }, h("h2", {}, t("Seguridad")));
 
   if (origenInseguro(loadConfig().baseUrl)) {
     secSeg.append(
@@ -213,7 +213,7 @@ export async function settingsView(_params, root, _signal) {
   botonesTema.forEach((b, i) => (b.dataset.tema = TEMAS[i]));
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, t("Apariencia")),
+    h("section", { class: "sec" }, h("h2", {}, t("Apariencia")),
       h("p", { class: "hint" }, t("«Auto» sigue el modo claro/oscuro del sistema.")),
       h("div", { class: "seg", role: "group", "aria-label": t("Tema") }, ...botonesTema),
       h("label", { class: "fila-toggle" },
@@ -246,7 +246,7 @@ export async function settingsView(_params, root, _signal) {
   );
 
   /* ================= NOTIFICACIONES ================= */
-  const secNotif = h("section", { class: "sec" }, h("h3", {}, "Notificaciones"));
+  const secNotif = h("section", { class: "sec" }, h("h2", {}, "Notificaciones"));
   const cajaNotif = h("div", { class: "pin-box" });
   secNotif.append(cajaNotif);
 
@@ -371,14 +371,14 @@ export async function settingsView(_params, root, _signal) {
   }, t("Vaciar caché"));
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, t("Diagnóstico")),
+    h("section", { class: "sec" }, h("h2", {}, t("Diagnóstico")),
       h("div", { class: "btn-row" }, verBtn, limpiarBtn, cacheBtn),
       logPre)
   );
 
   /* ================= SISTEMA ================= */
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, t("Sistema")),
+    h("section", { class: "sec" }, h("h2", {}, t("Sistema")),
       h("p", { class: "hint" }, t("Estado de los servicios del servidor: MCP, proveedores, plugins, skills y comandos.")),
       h("div", { class: "btn-row" },
         h("button", { class: "ghost", onClick: () => navigate("/system") }, t("Ver sistema"))))
@@ -386,7 +386,7 @@ export async function settingsView(_params, root, _signal) {
 
   /* ================= ACERCA DE ================= */
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, t("Acerca de")),
+    h("section", { class: "sec" }, h("h2", {}, t("Acerca de")),
       h("p", { class: "hint" },
         t("OpenCode Móvil · PWA sin frameworks (Vite + JS vanilla). Cliente de la API HTTP de opencode: sesiones, chat en streaming, permisos y bloqueo con PIN.")))
   );

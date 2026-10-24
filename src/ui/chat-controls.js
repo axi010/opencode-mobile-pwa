@@ -53,22 +53,31 @@ export function rutaAFileUri(rutaAbsoluta) {
   return "file://" + encodeURI(conPrefijo).replace(/#/g, "%23");
 }
 
-/* Hoja inferior generica: se cierra al tocar el fondo o con Escape. */
+/* Hoja inferior generica: se cierra al tocar el fondo o con Escape.
+   Se anuncia como dialogo modal y devuelve el foco al elemento que la abrio. */
 function hojaInferior(titulo, contenido) {
+  const focoPrevio = document.activeElement;
   const cerrar = () => {
     hoja.remove();
     document.removeEventListener("keydown", onKey);
+    if (focoPrevio && typeof focoPrevio.focus === "function") focoPrevio.focus();
   };
   const onKey = (e) => {
     if (e.key === "Escape") cerrar();
   };
   const hoja = h(
     "div",
-    { class: "sheet", onClick: (e) => { if (e.target === hoja) cerrar(); } },
+    {
+      class: "sheet",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": titulo,
+      onClick: (e) => { if (e.target === hoja) cerrar(); },
+    },
     h("div", { class: "sheet-panel" },
       h("div", { class: "sheet-head" },
         h("span", { class: "sheet-title" }, titulo),
-        h("button", { class: "icon-btn", type: "button", onClick: cerrar }, "✕")),
+        h("button", { class: "icon-btn", type: "button", "aria-label": t("Cerrar"), onClick: cerrar }, "✕")),
       contenido)
   );
   document.addEventListener("keydown", onKey);
@@ -85,13 +94,15 @@ export function crearControles({ sessionID, onArchivos }) {
   const lblModelo = h("span", { class: "chip-label" }, t("modelo…"));
   const btnModelo = h("button", {
     type: "button", class: "chip", title: t("Modelo y variante"),
+    // El nombre accesible incluye SIEMPRE el texto visible (WCAG 2.5.3).
+    "aria-label": `${t("Modelo y variante")}: ${t("modelo…")}`,
     onClick: () => abrirModelos(),
-  }, lblModelo, h("span", { class: "chip-caret" }, "▾"));
+  }, lblModelo, h("span", { class: "chip-caret", "aria-hidden": "true" }, "▾"));
 
   const btnAdjuntar = h("button", {
-    type: "button", class: "chip", title: t("Adjuntar archivos del PC"),
+    type: "button", class: "chip", title: t("Adjuntar archivos del PC"), "aria-label": t("Adjuntar archivos del PC"),
     onClick: () => abrirArchivos(),
-  }, "📎");
+  }, h("span", { "aria-hidden": "true" }, "📎"));
 
   const fila = h("div", { class: "chat-controls" }, segModo, btnModelo, btnAdjuntar);
 
@@ -106,10 +117,15 @@ export function crearControles({ sessionID, onArchivos }) {
   function pintarModelo() {
     if (!modelo) {
       lblModelo.textContent = t("modelo…");
+      btnModelo.setAttribute("aria-label", t("Modelo y variante"));
       return;
     }
     const v = modelo.variant && modelo.variant !== "default" ? ` · ${modelo.variant}` : "";
-    lblModelo.textContent = `${String(modelo.id).split("/").pop()}${v}`;
+    const nombre = `${String(modelo.id).split("/").pop()}${v}`;
+    lblModelo.textContent = nombre;
+    // El nombre accesible incluye el texto visible (WCAG 2.5.3): quien usa
+    // lector de pantalla oye "Modelo y variante: <modelo>".
+    btnModelo.setAttribute("aria-label", `${t("Modelo y variante")}: ${nombre}`);
   }
 
   async function setModo(nuevo) {

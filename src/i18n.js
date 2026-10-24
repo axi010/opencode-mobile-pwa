@@ -92,6 +92,7 @@ const EN = {
   "Antiguas": "Oldest",
   "Nombre": "Name",
   "Permisos pendientes": "Pending permissions",
+  "{n} permisos pendientes": "{n} pending permissions",
   "Carpeta del proyecto (en el PC)": "Project folder (on the PC)",
   "C:\\ruta\\del\\proyecto": "C:\\path\\to\\project",
   "Crear sesión": "Create session",

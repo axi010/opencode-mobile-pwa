@@ -150,12 +150,12 @@ function construirOverlay() {
     placeholder: "PIN",
     "aria-label": t("PIN del dispositivo"),
   });
-  err = h("p", { class: "error", hidden: true });
+  err = h("p", { class: "error", role: "alert", hidden: true });
   btn = h("button", { type: "submit" }, t("Desbloquear"));
   const form = h(
     "form",
-    { class: "lock-card" },
-    h("div", { class: "logo" }, "OC"),
+    { class: "lock-card", role: "dialog", "aria-modal": "true", "aria-label": t("Bloqueado") },
+    h("div", { class: "logo", "aria-hidden": "true" }, "OC"),
     h("h2", {}, t("Bloqueado")),
     h("p", { class: "hint" }, t("Introduce el PIN del dispositivo")),
     input,

@@ -54,6 +54,9 @@ body {
 }
 
 #app { display: flex; flex-direction: column; height: 100dvh; }
+/* Contenedor principal de cada vista (landmark <main>). Mantiene el layout
+   flex de #app: ocupa el alto restante y deja que la lista haga scroll. */
+.main { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 
 /* ---- barra superior ---- */
 .topbar {
@@ -253,8 +256,8 @@ mark.resaltado.activa {
   background: var(--bg3);
   color: var(--muted);
 }
-.sys-row.ok .sys-estado { background: color-mix(in srgb, var(--ok) 22%, transparent); color: var(--ok); }
-.sys-row.off .sys-estado { background: color-mix(in srgb, var(--err) 18%, transparent); color: var(--err); }
+.sys-row.ok .sys-estado { background: color-mix(in srgb, var(--ok) 22%, transparent); color: var(--ok-badge); }
+.sys-row.off .sys-estado { background: color-mix(in srgb, var(--err) 18%, transparent); color: var(--err-badge); }
 
 /* ---- barra de busqueda + orden (lista de sesiones) ---- */
 .lista-barra {
@@ -469,7 +472,7 @@ body.compacto .tool { font-size: 0.68rem; }
   flex-direction: column;
   gap: 10px;
 }
-.sec h3 { margin: 0; font-size: 0.92rem; }
+.sec h3, .sec h2 { margin: 0; font-size: 0.92rem; }
 .sec label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--muted); }
 .kv {
   display: flex;
@@ -848,11 +851,21 @@ select:focus { outline: none; border-color: var(--accent); }
   --accent-strong: #1f6feb;
   --ok-strong: #238636;
   --err-strong: #da3633;
+  /* Texto de los badges de estado (Sistema): el tono base no basta sobre el
+     fondo tintado; estos pasan AA medido con Lighthouse. */
+  --ok-badge: #56d364;
+  --err-badge: #ff8a80;
+  --accent-on-tint: #4293ff;
 }
 :root[data-theme="light"] {
   --accent-strong: #0969da;
   --ok-strong: #1a7f37;
   --err-strong: #cf222e;
+  --ok-badge: #0f5323;
+  --err-badge: #a40e26;
+  /* Texto de acento sobre fondos tintados (p. ej. el botón Copiar sobre
+     .code-head): el azul base roza 4.45, este pasa AA medido. */
+  --accent-on-tint: #0a58b0;
 }
 
 button[type="submit"], .composer button, .fab { background: var(--accent-strong); }
@@ -1025,7 +1038,7 @@ code, pre { font-family: ui-monospace, "SF Mono", Consolas, monospace; }
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--accent);
+  color: var(--accent-on-tint);
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;

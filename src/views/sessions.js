@@ -9,11 +9,19 @@ const LAST_DIR_KEY = "ocmovil.lastDir";
 const ORDEN_KEY = "ocmovil.ordenSesiones";
 
 export async function sessionsView(_params, root, signal) {
-  const permBadge = h("span", { class: "perm-badge", hidden: true }, "0");
+  const permBadge = h("span", { class: "perm-badge", "aria-hidden": "true", hidden: true }, "0");
   const permBtn = h(
     "button",
-    { class: "icon-btn perm-btn", title: t("Permisos pendientes"), onClick: () => navigate("/permissions") },
-    "🛡"
+    {
+      class: "icon-btn perm-btn",
+      title: t("Permisos pendientes"),
+      "aria-label": t("Permisos pendientes"),
+      onClick: () => navigate("/permissions"),
+    },
+    // El emoji y el contador son decorativos para el lector: el numero real se
+    // anuncia en el aria-label del boton (WCAG 2.5.3: el nombre visible debe
+    // estar contenido en el nombre accesible).
+    h("span", { "aria-hidden": "true" }, "🛡")
   );
   permBtn.append(permBadge);
 
@@ -23,7 +31,11 @@ export async function sessionsView(_params, root, signal) {
       { class: "topbar" },
       h("h1", {}, t("Sesiones")),
       permBtn,
-      h("button", { class: "icon-btn", title: t("Ajustes"), onClick: () => navigate("/settings") }, "⚙")
+      h(
+        "button",
+        { class: "icon-btn", title: t("Ajustes"), "aria-label": t("Ajustes"), onClick: () => navigate("/settings") },
+        "⚙"
+      )
     )
   );
 
@@ -42,7 +54,9 @@ export async function sessionsView(_params, root, signal) {
     h("option", { value: "nombre" }, t("Nombre"))
   );
   const barra = h("div", { class: "lista-barra" }, buscar, ordenSel);
-  root.append(barra);
+  const main = h("main", { class: "main" });
+  main.append(barra);
+  root.append(main);
 
   const newPanel = h("div", { class: "new-panel", hidden: true });
   const dirInput = h("input", {
@@ -103,7 +117,7 @@ export async function sessionsView(_params, root, signal) {
     h("p", { class: "empty-title" }, t("Todavía no hay sesiones")),
     h("p", { class: "hint" }, t("Pulsa + para crear la primera en la carpeta de tu proyecto."))
   );
-  root.append(newPanel, loading, vacio, list);
+  main.append(newPanel, loading, vacio, list);
 
   /* Refresco unificado (fluida): una sola pasada trae sesiones + permisos y
      el DOM solo se toca si algo ha cambiado (firma), preservando el scroll.
@@ -118,6 +132,11 @@ export async function sessionsView(_params, root, signal) {
     nPermisos = n;
     permBadge.hidden = n === 0;
     permBadge.textContent = String(n);
+    // El nombre accesible incluye el numero visible (WCAG 2.5.3).
+    permBtn.setAttribute(
+      "aria-label",
+      n > 0 ? t("{n} permisos pendientes", { n }) : t("Permisos pendientes")
+    );
   }
 
   /* Aplica busqueda (nombre/id) + orden elegido. Sin peticiones: se hace sobre

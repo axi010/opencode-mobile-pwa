@@ -13,7 +13,7 @@ export async function permissionsView(_params, root, signal) {
     h(
       "header",
       { class: "topbar" },
-      h("button", { class: "icon-btn", title: t("Volver"), onClick: () => navigate("/sessions") }, "‹"),
+      h("button", { class: "icon-btn", title: t("Volver"), "aria-label": t("Volver"), onClick: () => navigate("/sessions") }, "‹"),
       h("h1", {}, t("Permisos"))
     )
   );
@@ -26,7 +26,9 @@ export async function permissionsView(_params, root, signal) {
     t("Sin permisos pendientes. Cuando el agente necesite algo delicado (borrar, shell, escritura…), aquí lo decides.")
   );
   empty.hidden = true;
-  root.append(loading, list, empty);
+  const main = h("main", { class: "main" });
+  root.append(main);
+  main.append(loading, list, empty);
 
   async function reply(p, decision) {
     try {

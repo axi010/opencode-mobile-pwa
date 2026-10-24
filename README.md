@@ -195,6 +195,8 @@ npm test
 - 🐛 Found a bug? Open an issue — there is a template for it.
 - 💡 Have an idea? Use the **Feature request** template (explain the *problem* first).
 - 🔒 Security problem? **Do not open a public issue** — see [SECURITY.md](SECURITY.md).
+- ♿ Accessibility barrier? See [**ACCESSIBILITY.md**](ACCESSIBILITY.md) — what is
+  done, what is limited, and how to report it.
 
 No contribution is too small: a typo fix, a translation, a screenshot or a bug
 report all help. If you are unsure, open a *Discussion* and ask. 🙌
@@ -327,6 +329,8 @@ de leer y fácil de tocar.
 - 🐛 ¿Un fallo? Abre un *issue* (hay plantilla).
 - 💡 ¿Una idea? Usa la plantilla **Feature request** (explica el *problema* antes).
 - 🔒 ¿Problema de seguridad? **No abras un issue público** — mira [SECURITY.md](SECURITY.md).
+- ♿ ¿Una barrera de accesibilidad? Mira [**ACCESSIBILITY.md**](ACCESSIBILITY.md):
+  qué se hace, qué está limitado y cómo reportarlo.
 
 Ninguna aportación es pequeña: corregir una errata, traducir, una captura o
 reportar un bug ayudan. Si dudas, abre una *Discussion* y pregunta. 🙌

@@ -17,8 +17,13 @@ export async function chatView(params, root, signal) {
   const titleEl = h("h1", {}, "Chat");
   const stopBtn = h(
     "button",
-    { class: "icon-btn", hidden: true, title: t("Detener"), onClick: () =>
-        Client.interrupt(sessionID).catch((e) => toast(e.message)) },
+    {
+      class: "icon-btn",
+      hidden: true,
+      title: t("Detener"),
+      "aria-label": t("Detener"),
+      onClick: () => Client.interrupt(sessionID).catch((e) => toast(e.message)),
+    },
     "■"
   );
 
@@ -77,16 +82,23 @@ export async function chatView(params, root, signal) {
 
   root.append(
     h("header", { class: "topbar chat-top" },
-      h("button", { class: "icon-btn", title: "Volver", onClick: () => navigate("/sessions") }, "‹"),
+      h(
+        "button",
+        { class: "icon-btn", title: t("Volver"), "aria-label": t("Volver"), onClick: () => navigate("/sessions") },
+        "‹"
+      ),
       titleEl, btnBuscar, btnCopiarTodo, stopBtn)
   );
 
-  const offline = h("div", { class: "banner", hidden: true }, t("Sin conexión con el servidor · reintentando…"));
-  const permBanner = h("div", { class: "perm-banner", hidden: true });
+  const offline = h("div", { class: "banner", role: "status", "aria-live": "polite", hidden: true }, t("Sin conexión con el servidor · reintentando…"));
+  const permBanner = h("div", { class: "perm-banner", role: "status", "aria-live": "polite", hidden: true });
+  /* El scroller NO lleva aria-live: el texto llega token a token y el lector
+     anunciaria cada fragmento (ruido). Se anuncian el indicador "escribiendo…"
+     y el banner de permisos, que si son eventos discretos. */
   const scroller = h("div", { class: "chat-scroll" });
   const typing = h(
     "div",
-    { class: "typing", hidden: true },
+    { class: "typing", hidden: true, role: "status", "aria-live": "polite" },
     h("span", { class: "dots", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
     t("escribiendo…")
   );
@@ -198,7 +210,7 @@ export async function chatView(params, root, signal) {
         h("span", { class: "attach-chip" },
           h("span", { class: "attach-name", title: a.uri }, a.name),
           h("button", {
-            type: "button", class: "attach-x", title: t("Quitar"),
+            type: "button", class: "attach-x", title: t("Quitar"), "aria-label": t("Quitar"),
             onClick: () => { adjuntos.splice(i, 1); pintarAdjuntos(); },
           }, "✕"))
       );
@@ -216,7 +228,9 @@ export async function chatView(params, root, signal) {
     },
   });
 
-  root.append(offline, permBanner, controles.fila, buscarFila, cuerpo, typing);
+  const main = h("main", { class: "main" });
+  main.append(offline, permBanner, controles.fila, buscarFila, cuerpo, typing);
+  root.append(main);
 
   /* Botón "Copiar" de los bloques de código (delegado: el HTML de las burbujas
      se regenera con cada fragmento recibido por streaming). */
@@ -234,7 +248,7 @@ export async function chatView(params, root, signal) {
 
   const input = h("textarea", { rows: 1, placeholder: t("Mensaje…"), enterkeyhint: "send" });
   const sendBtn = h("button", {}, t("Enviar"));
-  root.append(chipsAdjuntos, h("div", { class: "composer" }, input, sendBtn));
+  main.append(chipsAdjuntos, h("div", { class: "composer" }, input, sendBtn));
 
   input.addEventListener("input", () => {
     input.style.height = "auto";

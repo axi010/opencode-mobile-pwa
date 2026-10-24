@@ -17,7 +17,7 @@ export async function systemView(_params, root, signal) {
     h(
       "header",
       { class: "topbar" },
-      h("button", { class: "icon-btn", title: t("Volver"), onClick: () => navigate("/settings") }, "‹"),
+      h("button", { class: "icon-btn", title: t("Volver"), "aria-label": t("Volver"), onClick: () => navigate("/settings") }, "‹"),
       h("h1", {}, t("Sistema"))
     )
   );
@@ -29,27 +29,27 @@ export async function systemView(_params, root, signal) {
   main.append(cargando);
 
   /* ---- MCP ---- */
-  const secMcp = h("section", { class: "sec" }, h("h3", {}, t("Servidores MCP")));
+  const secMcp = h("section", { class: "sec" }, h("h2", {}, t("Servidores MCP")));
   const listaMcp = h("div", { class: "sys-lista" });
   secMcp.append(listaMcp);
 
   /* ---- Proveedores ---- */
-  const secProv = h("section", { class: "sec" }, h("h3", {}, t("Proveedores de modelos")));
+  const secProv = h("section", { class: "sec" }, h("h2", {}, t("Proveedores de modelos")));
   const listaProv = h("div", { class: "sys-lista" });
   secProv.append(listaProv);
 
   /* ---- Plugins ---- */
-  const secPlug = h("section", { class: "sec" }, h("h3", {}, t("Plugins")));
+  const secPlug = h("section", { class: "sec" }, h("h2", {}, t("Plugins")));
   const listaPlug = h("div", { class: "sys-lista" });
   secPlug.append(listaPlug);
 
   /* ---- Skills ---- */
-  const secSkill = h("section", { class: "sec" }, h("h3", {}, t("Skills")));
+  const secSkill = h("section", { class: "sec" }, h("h2", {}, t("Skills")));
   const listaSkill = h("div", { class: "sys-lista" });
   secSkill.append(listaSkill);
 
   /* ---- Comandos ---- */
-  const secCmd = h("section", { class: "sec" }, h("h3", {}, t("Comandos")));
+  const secCmd = h("section", { class: "sec" }, h("h2", {}, t("Comandos")));
   const listaCmd = h("div", { class: "sys-lista" });
   secCmd.append(listaCmd);
 
@@ -57,7 +57,7 @@ export async function systemView(_params, root, signal) {
   const secLsp = h(
     "section",
     { class: "sec" },
-    h("h3", {}, t("Servidores de lenguaje (LSP)")),
+    h("h2", {}, t("Servidores de lenguaje (LSP)")),
     h(
       "p",
       { class: "hint" },
