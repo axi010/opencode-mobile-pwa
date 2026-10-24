@@ -118,6 +118,22 @@ opencode-mobile/
     └── views/              # setup, sessions, chat, permissions, settings
 ```
 
+## 🤝 Contributing
+
+**Everyone is welcome!** This is a small, framework-free project — easy to read and easy to hack on.
+
+- 🟢 **New here?** Check the pinned issues
+  [**👋 Ideas para colaborar**](https://github.com/axi010/opencode-mobile-pwa/issues/1)
+  (easy tasks) and the [**🗺️ Roadmap**](https://github.com/axi010/opencode-mobile-pwa/issues/2).
+- 📖 Read [**CONTRIBUTING.md**](CONTRIBUTING.md) for the setup and the two hard
+  design rules (no UI framework, no inline scripts/styles).
+- 🐛 Found a bug? Open an issue — there is a template for it.
+- 💡 Have an idea? Use the **Feature request** template (explain the *problem* first).
+- 🔒 Security problem? **Do not open a public issue** — see [SECURITY.md](SECURITY.md).
+
+No contribution is too small: a typo fix, a translation, a screenshot or a bug
+report all help. If you are unsure, open a *Discussion* and ask. 🙌
+
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE).
@@ -187,6 +203,23 @@ La API de opencode solo permite CORS desde loopback, así que la PWA habla con `
 - Un **QR contiene un token de 30 días** (equivalente a la contraseña). Trátalo como un secreto.
 - La app guarda la credencial en el `localStorage` del móvil.
 - El **PIN** es local al dispositivo (PBKDF2-SHA256, 150k iteraciones, espera creciente por fallo).
+
+## 🤝 Cómo colaborar
+
+**¡Cualquiera es bienvenido!** Es un proyecto pequeño y **sin frameworks**: fácil
+de leer y fácil de tocar.
+
+- 🟢 **¿Nuevo por aquí?** Mira los issues fijados
+  [**👋 Ideas para colaborar**](https://github.com/axi010/opencode-mobile-pwa/issues/1)
+  (tareas fáciles) y el [**🗺️ Roadmap**](https://github.com/axi010/opencode-mobile-pwa/issues/2).
+- 📖 Lee [**CONTRIBUTING.md**](CONTRIBUTING.md) para el setup y las dos reglas de
+  diseño (sin framework de UI, sin scripts/estilos en línea).
+- 🐛 ¿Un fallo? Abre un *issue* (hay plantilla).
+- 💡 ¿Una idea? Usa la plantilla **Feature request** (explica el *problema* antes).
+- 🔒 ¿Problema de seguridad? **No abras un issue público** — mira [SECURITY.md](SECURITY.md).
+
+Ninguna aportación es pequeña: corregir una errata, traducir, una captura o
+reportar un bug ayudan. Si dudas, abre una *Discussion* y pregunta. 🙌
 
 ## 📄 Licencia
 
