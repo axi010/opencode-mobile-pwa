@@ -6,6 +6,7 @@ import { isConfigured, qrParams } from "./config.js";
 import { initSecurity } from "./security.js";
 import { initTheme } from "./theme.js";
 import { iniciarVigilantePermisos, marcarPendientesComoVistos } from "./permisos-avisos.js";
+import { esIOS, esInstalada } from "./notify.js";
 import { setupView } from "./views/setup.js";
 import { sessionsView } from "./views/sessions.js";
 import { chatView } from "./views/chat.js";
@@ -49,7 +50,38 @@ initSecurity().then(() => {
   // como vistos los pendientes actuales para no notificar lo que ya se ve.
   marcarPendientesComoVistos();
   iniciarVigilantePermisos();
+  mostrarAvisoInstalarIOS();
 });
+
+/* iOS: las notificaciones (y el modo app) solo funcionan si la PWA esta
+   INSTALADA en la pantalla de inicio. Se avisa una sola vez, y solo si no
+   esta instalada todavia. */
+function mostrarAvisoInstalarIOS() {
+  try {
+    if (!esIOS() || esInstalada()) return;
+    if (localStorage.getItem("ocmovil.iosTipVisto") === "1") return;
+    const tip = document.createElement("div");
+    tip.className = "ios-tip";
+    tip.append(
+      document.createTextNode(
+        "📲 Para instalarla: Compartir → «Añadir a pantalla de inicio». Así funcionan el PIN y las notificaciones."
+      )
+    );
+    const x = document.createElement("button");
+    x.type = "button";
+    x.setAttribute("aria-label", "Cerrar aviso");
+    x.textContent = "✕";
+    x.addEventListener("click", () => {
+      localStorage.setItem("ocmovil.iosTipVisto", "1");
+      tip.remove();
+    });
+    tip.append(x);
+    const app = document.getElementById("app");
+    if (app) app.prepend(tip);
+  } catch {
+    /* el aviso es opcional */
+  }
+}
 
 /* Auto-diagnostico: errores de cliente visibles (con rate-limit) + log local. */
 let lastToastAt = 0;

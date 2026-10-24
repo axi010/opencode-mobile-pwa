@@ -1,14 +1,62 @@
-/* Notificaciones locales (sin servidor push).
-   ALCANCE REAL (honestidad primero):
+/* Notificaciones locales (sin servidor push propio).
+   ALCANCE REAL por plataforma (honestidad primero):
    - Requiere permiso del usuario y contexto seguro (https o localhost).
-   - En PRIMER plano el SO puede no mostrarlas: ademas del aviso del sistema,
-     la app ya muestra un toast.
-   - En SEGUNDO plano Android mantiene el service worker unos ~30 s: si el
-     permiso llega dentro de esa ventana, se notifica; despues, no (no hay push).
-   - iOS (Safari/PWA) NO soporta Notification API en web: queda desactivado.
-   El objetivo es avisar del permiso del agente cuando NO estas mirando la app. */
+   - Android/escritorio: el service worker aguanta unos ~30 s tras ocultar la
+     app; si el permiso llega en esa ventana, se notifica.
+   - **iOS 16.4+**: SÍ soporta notificaciones, pero SOLO si la PWA esta
+     INSTALADA en la pantalla de inicio ("Anadir a inicio"). Desde una pestana
+     de Safari, `Notification` existe pero el permiso siempre se deniega.
+     Apple tampoco permite despertar la app en segundo plano (no hay push sin
+     servidor), asi que el aviso solo llega con la app recien ocultada.
+   - iOS tambien soporta Web Push (Push API) desde 16.4 si esta instalada, pero
+     necesitaria un servidor push; aqui no se usa. */
 
 const SOPORTADO = typeof window !== "undefined" && "Notification" in window;
+
+/* iOS/iPadOS (incluye iPad moderno que se identifica como Mac). */
+export function esIOS() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (/iPad|iPhone|iPod/.test(ua)) return true;
+  // iPadOS 13+ se identifica como "Macintosh": se distingue del Mac real
+  // porque tiene pantalla tactil (maxTouchPoints > 1). En Mac, maxTouchPoints
+  // es 0 (o 1 en algun trackpad, por eso se pide > 1).
+  if (/Macintosh/.test(ua)) {
+    try {
+      if ((navigator.maxTouchPoints || 0) > 1) return true;
+      if (typeof document !== "undefined" && "ontouchend" in document) return true;
+    } catch {
+      /* sin datos de tactil */
+    }
+  }
+  return false;
+}
+
+/* true si la PWA corre instalada (standalone), no en una pestana del navegador.
+   En iOS es REQUISITO para poder notificar. */
+export function esInstalada() {
+  try {
+    if (typeof window === "undefined") return false;
+    if (window.matchMedia?.("(display-mode: standalone)").matches) return true;
+    if (window.matchMedia?.("(display-mode: fullscreen)").matches) return true;
+    if (window.matchMedia?.("(display-mode: minimal-ui)").matches) return true;
+    // iOS antiguo expone navigator.standalone
+    if (navigator.standalone === true) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/* ¿Podemos pedir permiso de notificaciones en ESTE navegador/contexto?
+   Devuelve un objeto con el motivo cuando no se puede, para poder explicarlo. */
+export function capacidad() {
+  if (!SOPORTADO) return { puede: false, motivo: "no-soportado" };
+  if (contextoInseguro()) return { puede: false, motivo: "inseguro" };
+  // En iOS, sin instalar en la pantalla de inicio el permiso se deniega siempre.
+  if (esIOS() && !esInstalada()) return { puede: false, motivo: "ios-no-instalada" };
+  return { puede: true, motivo: null };
+}
 
 export function notifySoportado() {
   return SOPORTADO;
@@ -23,18 +71,20 @@ export function contextoInseguro() {
 }
 
 export function estado() {
-  if (!SOPORTADO) return "no-soportado";
-  if (contextoInseguro()) return "inseguro";
+  const cap = capacidad();
+  if (!cap.puede) return cap.motivo; // "no-soportado" | "inseguro" | "ios-no-instalada"
   return Notification.permission; // "default" | "granted" | "denied"
 }
 
 export async function pedirPermiso() {
-  if (!SOPORTADO) return "no-soportado";
-  if (contextoInseguro()) return "inseguro";
+  const cap = capacidad();
+  if (!cap.puede) return cap.motivo;
   if (Notification.permission === "granted") return "granted";
   if (Notification.permission === "denied") return "denied";
   try {
-    return await Notification.requestPermission();
+    // iOS acepta la version con callback; se usa Promise si existe.
+    const r = Notification.requestPermission();
+    return r && typeof r.then === "function" ? await r : Notification.permission;
   } catch {
     return "default";
   }
@@ -44,9 +94,8 @@ async function viaServiceWorker(titulo, opciones) {
   if (!("serviceWorker" in navigator)) return false;
   const reg = await navigator.serviceWorker.getRegistration();
   if (!reg) return false;
-  // Via preferente en Android: mensaje al SW (el listener lo muestra).
-  // La pagina puede estar a punto de suspenderse; el SW sigue vivo unos
-  // segundos y es quien tiene permiso para mostrar la notificacion.
+  // Via preferente: mensaje al SW (su listener lo muestra). La pagina puede
+  // estar a punto de suspenderse y el SW sigue vivo unos segundos.
   const destino = navigator.serviceWorker.controller || reg.active;
   if (destino) {
     destino.postMessage({
@@ -66,8 +115,8 @@ async function viaServiceWorker(titulo, opciones) {
 }
 
 /* Lanza una notificacion si hay permiso. Prioriza el service worker (necesario
-   en Android y unico camino si la pestana no esta enfocada); si no hay SW,
-   cae al constructor Notification. Devuelve true si se mostro. */
+   en Android y unico camino si la pestana no esta enfocada); si no hay SW, cae
+   al constructor Notification (util en escritorio). Devuelve true si se mostro. */
 export async function notificar(titulo, cuerpo, { tag, onClickUrl } = {}) {
   if (estado() !== "granted") return false;
   const opciones = {

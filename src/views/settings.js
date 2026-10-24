@@ -229,7 +229,7 @@ export async function settingsView(_params, root, _signal) {
     if (est === "no-soportado") {
       cajaNotif.append(
         h("p", { class: "hint" },
-          "Este navegador no soporta notificaciones. En iPhone/iPad (iOS) las PWA no pueden notificar: usa el badge 🛡 y el aviso del chat.")
+          "Este navegador no soporta notificaciones. Usa el badge 🛡 de la lista y el banner del chat, que sí funcionan.")
       );
       return;
     }
@@ -240,12 +240,27 @@ export async function settingsView(_params, root, _signal) {
       );
       return;
     }
+    // iOS: solo puede notificar si la app esta INSTALADA en la pantalla de inicio
+    if (est === "ios-no-instalada") {
+      cajaNotif.append(
+        h("p", { class: "hint" },
+          "En iPhone/iPad, Apple solo permite notificar a las webs **instaladas**. Instálala y vuelve aquí:"),
+        h("ol", { class: "pasos" },
+          h("li", {}, "Pulsa **Compartir** (el cuadrado con la flecha) en Safari."),
+          h("li", {}, "Elige **«Añadir a pantalla de inicio»**."),
+          h("li", {}, "Abre la app desde el icono nuevo y activa aquí las notificaciones.")
+        ),
+        h("p", { class: "hint" },
+          "Aviso: aunque la instales, Apple **no permite** despertar la app en segundo plano, así que el aviso llega solo si acabas de dejar la app (unos segundos). El badge 🛡 y el banner del chat siempre funcionan.")
+      );
+      return;
+    }
 
     const texto =
       est === "granted"
         ? "Activadas: te avisaré cuando el agente pida un permiso y no estés mirando la app."
         : est === "denied"
-          ? "Bloqueadas por el navegador. Actívalas en los ajustes del sitio (icono junto a la URL)."
+          ? "Bloqueadas por el navegador. Actívalas en los ajustes del sitio (icono junto a la URL) y recarga."
           : "Desactivadas.";
     cajaNotif.append(h("p", { class: "hint" }, texto));
 

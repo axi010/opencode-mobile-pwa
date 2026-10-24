@@ -44,7 +44,9 @@ function guardarReciente(id, providerID, variant) {
 }
 
 function rutaAFileUri(rutaAbsoluta) {
-  // formato verificado: file:///C:/ruta/con/barras
+  /* Formato verificado contra el servidor: file:///C:/ruta/con/barras
+     (Windows). En macOS/Linux la ruta ya empieza por "/", asi que sale
+     file:///Users/... correctamente. encodeURI codifica espacios y demas. */
   const conBarras = String(rutaAbsoluta).replace(/\\/g, "/");
   const conPrefijo = conBarras.startsWith("/") ? conBarras : `/${conBarras}`;
   return "file://" + encodeURI(conPrefijo).replace(/#/g, "%23");
@@ -291,7 +293,7 @@ export function crearControles({ sessionID, onArchivos }) {
         fuera.hidden = !raiz || ruta.toLowerCase().startsWith(String(raiz).toLowerCase());
         lista.textContent = "";
         const entradas = entradasCrudas
-          .map((e) => ({ ...e, abs: home ? `${home}\\${e.path.replace(/^\//, "")}` : e.path }))
+          .map((e) => ({ ...e, abs: absoluta(home, e.path) }))
           .filter((e) => !IGNORAR.test(nombreDe(e.path)))
           .sort((a, b) => (a.type === b.type ? nombreDe(a.path).localeCompare(nombreDe(b.path)) : a.type === "directory" ? -1 : 1));
         for (const e of entradas) lista.append(filaEntrada(e));
@@ -387,14 +389,26 @@ function dirPadre(p) {
   return i <= 2 ? s : s.slice(0, i);
 }
 /* fs/list devuelve rutas RELATIVAS al home del usuario (p. ej.
-   "Documents/mi-proyecto/src/"). Para reconstruir la absoluta
-   hay que saber el home, y se deduce una sola vez: las entradas cuelgan de
-   la carpeta pedida, asi que su prefijo comun es la parte de la ruta pedida
-   que queda por debajo del home. */
+   "Documents/mi-proyecto/src/" en macOS/Linux o "OneDrive\\Documentos\\..."
+   en Windows). Para reconstruir la absoluta hay que saber el home, y se deduce
+   una sola vez: las entradas cuelgan de la carpeta pedida, asi que su prefijo
+   comun es la parte de la ruta pedida que queda por debajo del home.
+   MULTIPLATAFORMA: se detecta el separador de la ruta pedida (\\ o /) y se usa
+   el mismo en la reconstruccion, para que funcione con servidores Windows,
+   macOS y Linux. */
 let homeCache = "";
+function separadorDe(ruta) {
+  const s = String(ruta || "");
+  return s.includes("\\") ? "\\" : "/";
+}
 function deducirHome(rutaPedida, entradas) {
   if (homeCache) return homeCache;
-  const norm = (s) => String(s).replace(/\//g, "\\").replace(/\\+$/, "");
+  const sep = separadorDe(rutaPedida);
+  const norm = (s) => {
+    let t = String(s);
+    if (sep === "\\") t = t.replace(/\//g, "\\");
+    return t.replace(/[\\/]+$/, "");
+  };
   const pedida = norm(rutaPedida);
   const paths = entradas.map((e) => norm(e.path)).filter(Boolean);
   if (!paths.length) return "";
@@ -406,12 +420,12 @@ function deducirHome(rutaPedida, entradas) {
     pref = pref.slice(0, i);
   }
   // se recorta el ultimo segmento parcial -> queda la carpeta relativa al home
-  const relDir = pref.slice(0, Math.max(0, pref.lastIndexOf("\\")));
+  const relDir = pref.slice(0, Math.max(0, pref.lastIndexOf(sep)));
   if (!relDir) {
     homeCache = pedida; // la carpeta pedida ES el home
     return homeCache;
   }
-  const sufijo = "\\" + relDir;
+  const sufijo = sep + relDir;
   if (pedida.toLowerCase().endsWith(sufijo.toLowerCase())) {
     homeCache = pedida.slice(0, pedida.length - sufijo.length);
     return homeCache;
@@ -421,6 +435,7 @@ function deducirHome(rutaPedida, entradas) {
 /* reconstruye la absoluta de una entrada a partir del home deducido */
 function absoluta(home, p) {
   const s = String(p).replace(/[\\/]+$/, "");
-  if (/^[A-Za-z]:/.test(s)) return s;
-  return home ? `${home}\\${s.replace(/^\//, "")}` : s;
+  if (/^[A-Za-z]:/.test(s) || s.startsWith("/")) return s; // ya es absoluta
+  const sep = separadorDe(home || p);
+  return home ? `${home}${sep}${s.replace(/^[\\/]+/, "")}` : s;
 }
