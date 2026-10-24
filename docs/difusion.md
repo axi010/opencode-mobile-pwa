@@ -7,6 +7,7 @@ de decidir, y eso multiplica los clics.
 | --- | --- |
 | ▶️ **Demo** (sin instalar) | https://axi010.github.io/opencode-mobile-pwa/ |
 | 📦 **Repo** | https://github.com/axi010/opencode-mobile-pwa |
+| 🎬 **GIF animado** (demo de 9 s) | https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/demo.gif |
 | 🖼 Captura del chat | https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/chat.png |
 | 🖼 Captura de sesiones | https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/sessions.png |
 | 🖼 Captura de permisos | https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/permissions.png |
@@ -29,7 +30,7 @@ permission or switch models. So I built a small PWA for that.
 ▶️ Try it right now (fake data, nothing to install):
 https://axi010.github.io/opencode-mobile-pwa/
 
-https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/chat.png
+https://raw.githubusercontent.com/axi010/opencode-mobile-pwa/master/screenshots/demo.gif
 
 What it does
 • Real-time chat (SSE) with reasoning, tool chips and a stop button

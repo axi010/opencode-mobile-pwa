@@ -19,6 +19,10 @@
 ▶️ **[Try the live demo](https://axi010.github.io/opencode-mobile-pwa/)** — fake data, nothing to install.
 
 <p align="center">
+  <img src="screenshots/demo.gif" width="300" alt="Animated demo: session list, search, chat with permissions and model picker" />
+</p>
+
+<p align="center">
   <img src="screenshots/sessions.png" width="250" alt="Sessions list with search and sort" />
   <img src="screenshots/chat.png" width="250" alt="Chat with permissions banner, Plan/Build switch and model picker" />
   <img src="screenshots/permissions.png" width="250" alt="Approve or reject agent permissions" />
@@ -29,6 +33,10 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 > **Español:** [Ir a la versión en español](#-español)
 
 ▶️ **[Prueba la demo](https://axi010.github.io/opencode-mobile-pwa/)** — datos ficticios, sin instalar nada.
+
+<p align="center">
+  <img src="screenshots/demo.gif" width="300" alt="Demo animada: lista de sesiones, búsqueda, chat con permisos y selector de modelo" />
+</p>
 
 <p align="center">
   <img src="screenshots/sessions.png" width="250" alt="Lista de sesiones con buscador y orden" />
