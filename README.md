@@ -42,7 +42,30 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 > own credential on your device.
 
 
-## 🔧 Requirements
+## 📱 Platform support
+
+| Feature | Android | iOS (iPhone/iPad) | Desktop |
+| --- | --- | --- | --- |
+| Chat, sessions, permissions, model picker, attach files | ✅ | ✅ | ✅ |
+| PIN lock (needs HTTPS) | ✅ | ✅ | ✅ |
+| Install as an app | ✅ | ✅ (Share → *Add to Home Screen*) | ✅ (Chrome/Edge) |
+| In-app alerts (badge 🛡, chat banner) | ✅ | ✅ | ✅ |
+| System notification when the app is **closed** | ✅ (~30 s window) | ⚠️ **only if installed** + no background wake | ✅ |
+| Background push | ❌ | ❌ | ❌ |
+
+**Notes**
+
+- **iOS**: Apple only allows web apps **installed on the Home Screen** to notify
+  (since iOS 16.4). Even then, iOS does not allow waking the app in the
+  background, so a notification only arrives shortly after you leave the app.
+  The app detects this and tells you what to do. Also: iOS does **not** run the
+  PIN over plain `http://` (needs HTTPS) — use the tunnel.
+- **Windows / macOS / Linux as the server**: the file browser works with either
+  path separator, so attaching files works with an opencode server on any OS.
+- **No push server**: notifications are local. Real background push would need a
+  small server of your own (see the roadmap).
+
+
 
 - [opencode](https://opencode.ai) desktop or CLI installed and running on your PC (the server listens on `127.0.0.1:28894`).
 - Node.js 18+ to build and serve the PWA.
@@ -155,6 +178,30 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Tema claro / oscuro / automático**, siguiendo al sistema.
 - **Notificaciones locales** cuando el agente pide un permiso y no estás mirando la app.
 - **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 45 kB comprimidos.
+
+## 📱 Compatibilidad de plataformas
+
+| Función | Android | iOS (iPhone/iPad) | Escritorio |
+| --- | --- | --- | --- |
+| Chat, sesiones, permisos, modelo, adjuntar archivos | ✅ | ✅ | ✅ |
+| PIN (necesita HTTPS) | ✅ | ✅ | ✅ |
+| Instalar como app | ✅ | ✅ (Compartir → *Añadir a pantalla de inicio*) | ✅ (Chrome/Edge) |
+| Avisos en la app (badge 🛡, banner del chat) | ✅ | ✅ | ✅ |
+| Notificación del sistema con la app **cerrada** | ✅ (~30 s) | ⚠️ **solo si está instalada** + sin despertar en 2º plano | ✅ |
+| Push en segundo plano | ❌ | ❌ | ❌ |
+
+**Notas**
+
+- **iOS**: Apple solo permite notificar a las webs **instaladas en la pantalla de
+  inicio** (desde iOS 16.4). Y aun así, iOS **no permite despertar** la app en
+  segundo plano, así que el aviso llega solo si acabas de salir de la app. La app
+  lo detecta y te dice qué hacer. Además, en iOS el **PIN no funciona por
+  `http://`** (necesita HTTPS): usa el túnel.
+- **Servidor en Windows / macOS / Linux**: el explorador de archivos funciona con
+  cualquier separador de ruta, así que adjuntar archivos va con el servidor
+  opencode en cualquier sistema.
+- **Sin servidor push**: las notificaciones son locales. El push real en segundo
+  plano necesitaría un servidor propio pequeño (ver el roadmap).
 
 ## 🔧 Requisitos
 
