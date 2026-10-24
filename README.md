@@ -1,5 +1,19 @@
 # OpenCode Móvil — PWA client for opencode
 
+> ⚠️ **Disclaimer / Aviso**: this is an **unofficial, community-made** project.
+> It is **not built by the OpenCode team** and is **not affiliated with or
+> endorsed by** [opencode](https://opencode.ai) or Anomaly in any way.
+> «opencode» is used only to describe what this app connects to.
+>
+> Este es un proyecto **no oficial** hecho por la comunidad. **No está
+> desarrollado por el equipo de OpenCode** ni está **afiliado ni respaldado** por
+> [opencode](https://opencode.ai) o Anomaly.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
+[![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
+[![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
+
 A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) server from your phone: chat with your sessions in real time, approve permissions, pick the model, browse your project's files and attach them, all from a tiny, dependency-free client.
 
 > **Español:** [Ir a la versión en español](#-español)
@@ -18,13 +32,16 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
 - **No frameworks**: vanilla JS + a ~20-line DOM helper. ~45 kB gzipped.
 
-## 📱 Screens
+<!--
+## 📱 Screenshots
+
+Add your own images to a `screenshots/` folder and uncomment this block:
 
 | Sessions | Chat | Settings |
 | --- | --- | --- |
-| `screenshots/sessions.png` | `screenshots/chat.png` | `screenshots/settings.png` |
+| ![Sessions](screenshots/sessions.png) | ![Chat](screenshots/chat.png) | ![Settings](screenshots/settings.png) |
+-->
 
-> Add your own screenshots in a `screenshots/` folder to replace these placeholders.
 
 ## 🔧 Requirements
 
