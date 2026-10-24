@@ -9,6 +9,7 @@ import { h, renderMarkdown, timeAgo, toast, copiarTexto } from "../ui/dom.js";
 import { Client, subscribeEvents } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 import { crearControles } from "../ui/chat-controls.js";
+import { t } from "../i18n.js";
 
 export async function chatView(params, root, signal) {
   const sessionID = params.id;
@@ -16,7 +17,7 @@ export async function chatView(params, root, signal) {
   const titleEl = h("h1", {}, "Chat");
   const stopBtn = h(
     "button",
-    { class: "icon-btn", hidden: true, title: "Detener", onClick: () =>
+    { class: "icon-btn", hidden: true, title: t("Detener"), onClick: () =>
         Client.interrupt(sessionID).catch((e) => toast(e.message)) },
     "■"
   );
@@ -26,7 +27,7 @@ export async function chatView(params, root, signal) {
   const buscarChat = h("input", {
     type: "search",
     class: "buscar-chat",
-    placeholder: "Buscar en la conversación…",
+    placeholder: t("Buscar en la conversación…"),
     autocomplete: "off",
     spellcheck: "false",
     hidden: true,
@@ -35,8 +36,8 @@ export async function chatView(params, root, signal) {
   const btnBuscar = h("button", {
     type: "button",
     class: "icon-btn",
-    title: "Buscar en la conversación",
-    "aria-label": "Buscar en la conversación",
+    title: t("Buscar en la conversación"),
+    "aria-label": t("Buscar en la conversación"),
     onClick: () => {
       buscarChat.hidden = !buscarChat.hidden;
       if (!buscarChat.hidden) buscarChat.focus();
@@ -52,8 +53,8 @@ export async function chatView(params, root, signal) {
   const btnCopiarTodo = h("button", {
     type: "button",
     class: "icon-btn",
-    title: "Copiar toda la conversación",
-    "aria-label": "Copiar toda la conversación",
+    title: t("Copiar toda la conversación"),
+    "aria-label": t("Copiar toda la conversación"),
     onClick: async () => {
       const partes = [];
       for (const el of scroller.children) {
@@ -66,10 +67,10 @@ export async function chatView(params, root, signal) {
           partes.push(`> ${el.textContent.trim()}\n`);
         }
       }
-      if (!partes.length) return toast("No hay nada que copiar");
+      if (!partes.length) return toast(t("No hay nada que copiar"));
       const texto = `# Conversación — ${titleEl.textContent}\n\n${partes.join("\n")}`;
       const ok = await copiarTexto(texto);
-      toast(ok ? "Conversación copiada en Markdown" : "No se pudo copiar");
+      toast(ok ? t("Conversación copiada en Markdown") : t("No se pudo copiar"));
     },
   }, "⧉");
   const buscarFila = h("div", { class: "chat-buscar" }, buscarChat, cuentaChat);
@@ -80,14 +81,14 @@ export async function chatView(params, root, signal) {
       titleEl, btnBuscar, btnCopiarTodo, stopBtn)
   );
 
-  const offline = h("div", { class: "banner", hidden: true }, "Sin conexión con el servidor · reintentando…");
+  const offline = h("div", { class: "banner", hidden: true }, t("Sin conexión con el servidor · reintentando…"));
   const permBanner = h("div", { class: "perm-banner", hidden: true });
   const scroller = h("div", { class: "chat-scroll" });
   const typing = h(
     "div",
     { class: "typing", hidden: true },
     h("span", { class: "dots", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
-    "escribiendo…"
+    t("escribiendo…")
   );
 
   /* Botón flotante para volver al final cuando se ha subido en la conversación */
@@ -97,8 +98,8 @@ export async function chatView(params, root, signal) {
       type: "button",
       class: "to-bottom",
       hidden: true,
-      title: "Ir al final",
-      "aria-label": "Ir al final",
+      title: t("Ir al final"),
+      "aria-label": t("Ir al final"),
       onClick: () => {
         const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
         scroller.scrollTo({ top: scroller.scrollHeight, behavior: reducir ? "auto" : "smooth" });
@@ -197,7 +198,7 @@ export async function chatView(params, root, signal) {
         h("span", { class: "attach-chip" },
           h("span", { class: "attach-name", title: a.uri }, a.name),
           h("button", {
-            type: "button", class: "attach-x", title: "Quitar",
+            type: "button", class: "attach-x", title: t("Quitar"),
             onClick: () => { adjuntos.splice(i, 1); pintarAdjuntos(); },
           }, "✕"))
       );
@@ -211,7 +212,7 @@ export async function chatView(params, root, signal) {
         if (!adjuntos.some((a) => a.uri === f.uri)) adjuntos.push(f);
       }
       pintarAdjuntos();
-      toast(`${files.length} archivo(s) adjuntado(s)`);
+      toast(t("{n} archivo(s) adjuntado(s)", { n: files.length }));
     },
   });
 
@@ -225,14 +226,14 @@ export async function chatView(params, root, signal) {
     const pre = btn.closest(".code-block")?.querySelector("pre");
     if (!pre) return;
     const ok = await copiarTexto(pre.textContent);
-    btn.textContent = ok ? "Copiado" : "No se pudo";
+    btn.textContent = ok ? t("Copiado") : t("No se pudo");
     setTimeout(() => {
-      btn.textContent = "Copiar";
+      btn.textContent = t("Copiar");
     }, 1500);
   });
 
-  const input = h("textarea", { rows: 1, placeholder: "Mensaje…", enterkeyhint: "send" });
-  const sendBtn = h("button", {}, "Enviar");
+  const input = h("textarea", { rows: 1, placeholder: t("Mensaje…"), enterkeyhint: "send" });
+  const sendBtn = h("button", {}, t("Enviar"));
   root.append(chipsAdjuntos, h("div", { class: "composer" }, input, sendBtn));
 
   input.addEventListener("input", () => {
@@ -305,7 +306,7 @@ export async function chatView(params, root, signal) {
     if (!r) {
       const pre = h("pre", {});
       const details = h("details", { class: "reasoning" },
-        h("summary", {}, "pensando…"), pre);
+        h("summary", {}, t("pensando…")), pre);
       const b = ensureBubble(key);
       b.el.insertBefore(details, b.body);
       r = { details, pre, raw: "" };
@@ -362,7 +363,7 @@ export async function chatView(params, root, signal) {
   async function respond(p, decision) {
     try {
       await Client.replyPermission(p.sessionID, p.id, decision);
-      toast(decision === "reject" ? "Permiso rechazado" : decision === "always" ? "Permitido (siempre)" : "Permitido");
+      toast(decision === "reject" ? t("Permiso rechazado") : decision === "always" ? t("Permitido (siempre)") : t("Permitido"));
       await refreshPermissions();
     } catch (err) {
       toast(err.message || "No se pudo responder");
@@ -442,14 +443,14 @@ export async function chatView(params, root, signal) {
         const r = ensureReasoning(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
         r.raw += d.delta || "";
         r.pre.textContent = r.raw;
-        r.details.querySelector("summary").textContent = "pensando…";
+        r.details.querySelector("summary").textContent = t("pensando…");
         break;
       }
       case "session.reasoning.ended": {
         const r = ensureReasoning(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
         r.raw = d.text || r.raw;
         r.pre.textContent = r.raw;
-        r.details.querySelector("summary").textContent = "pensado";
+        r.details.querySelector("summary").textContent = t("pensado");
         break;
       }
       case "session.tool.input.started":
@@ -567,7 +568,7 @@ export async function chatView(params, root, signal) {
     try {
       await Client.prompt(sessionID, text, files);
     } catch (err) {
-      toast(`No se pudo enviar: ${err.message}`);
+      toast(t("No se pudo enviar: ") + err.message);
       if (err.isAuth) navigate("/setup");
     }
   }

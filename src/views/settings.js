@@ -6,6 +6,7 @@ import { loadConfig, saveConfig, clearConfig } from "../config.js";
 import { Client } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 import { getTheme, setTheme, TEMAS } from "../theme.js";
+import { t, IDIOMAS, getIdioma, setIdioma } from "../i18n.js";
 import { notifySoportado, estado as estadoNotif, pedirPermiso, notificar, contextoInseguro } from "../notify.js";
 import {
   hasPin,
@@ -38,8 +39,8 @@ export async function settingsView(_params, root, _signal) {
     h(
       "header",
       { class: "topbar" },
-      h("button", { class: "icon-btn", title: "Volver", onClick: () => navigate("/sessions") }, "‹"),
-      h("h1", {}, "Ajustes")
+      h("button", { class: "icon-btn", title: t("Volver"), onClick: () => navigate("/sessions") }, "‹"),
+      h("h1", {}, t("Ajustes"))
     )
   );
 
@@ -47,36 +48,36 @@ export async function settingsView(_params, root, _signal) {
   root.append(main);
 
   /* ================= CONEXION ================= */
-  const kvUrl = h("div", { class: "kv" }, h("span", {}, "Servidor"), h("b", {}, "…"));
-  const kvAlt = h("div", { class: "kv" }, h("span", {}, "Alternativa"), h("b", {}, "—"));
-  const kvModo = h("div", { class: "kv" }, h("span", {}, "Modo"), h("b", {}, "…"));
-  const kvVer = h("div", { class: "kv" }, h("span", {}, "Versión"), h("b", {}, "…"));
-  const probarBtn = h("button", { class: "ghost", onClick: probar }, "Probar conexión");
-  const cambiarBtn = h("button", { class: "ghost", onClick: () => navigate("/setup") }, "Cambiar servidor");
-  const swapBtn = h("button", { class: "ghost", onClick: swapUrl }, "Usar alternativa");
+  const kvUrl = h("div", { class: "kv" }, h("span", {}, t("Servidor")), h("b", {}, "…"));
+  const kvAlt = h("div", { class: "kv" }, h("span", {}, t("Alternativa")), h("b", {}, "—"));
+  const kvModo = h("div", { class: "kv" }, h("span", {}, t("Modo")), h("b", {}, "…"));
+  const kvVer = h("div", { class: "kv" }, h("span", {}, t("Versión")), h("b", {}, "…"));
+  const probarBtn = h("button", { class: "ghost", onClick: probar }, t("Probar conexión"));
+  const cambiarBtn = h("button", { class: "ghost", onClick: () => navigate("/setup") }, t("Cambiar servidor"));
+  const swapBtn = h("button", { class: "ghost", onClick: swapUrl }, t("Usar alternativa"));
 
   function pintarConexion() {
     const cfg = loadConfig();
-    kvUrl.querySelector("b").textContent = cfg.baseUrl || "sin URL";
+    kvUrl.querySelector("b").textContent = cfg.baseUrl || t("sin URL");
     kvAlt.querySelector("b").textContent = cfg.altUrl || "—";
-    kvModo.querySelector("b").textContent = cfg.sameOrigin ? "proxy same-origin" : "directo (CORS)";
+    kvModo.querySelector("b").textContent = cfg.sameOrigin ? t("proxy same-origin") : t("directo (CORS)");
     swapBtn.hidden = !cfg.altUrl;
-    swapBtn.textContent = cfg.altUrl && cfg.altUrl !== cfg.baseUrl ? "Usar alternativa" : "Usar principal";
+    swapBtn.textContent = cfg.altUrl && cfg.altUrl !== cfg.baseUrl ? t("Usar alternativa") : t("Usar principal");
   }
 
   async function probar() {
     probarBtn.disabled = true;
-    probarBtn.textContent = "Probando…";
+    probarBtn.textContent = t("Probando…");
     try {
       const info = await Client.info();
       kvVer.querySelector("b").textContent = `v${info.version}`;
-      toast(`Conexión OK · opencode v${info.version}`);
+      toast(t("Conexión OK · opencode v{version}", { version: info.version }));
     } catch (e) {
       kvVer.querySelector("b").textContent = "—";
-      toast(e.message || "Sin conexión");
+      toast(e.message || t("Sin conexión"));
     } finally {
       probarBtn.disabled = false;
-      probarBtn.textContent = "Probar conexión";
+      probarBtn.textContent = t("Probar conexión");
     }
   }
 
@@ -85,31 +86,31 @@ export async function settingsView(_params, root, _signal) {
     if (!cfg.altUrl) return;
     saveConfig({ baseUrl: cfg.altUrl, altUrl: cfg.baseUrl || "" });
     pintarConexion();
-    toast("URL principal intercambiada");
+    toast(t("URL principal intercambiada"));
     probar();
   }
 
   pintarConexion();
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, "Conexión"), kvUrl, kvAlt, kvModo, kvVer,
+    h("section", { class: "sec" }, h("h3", {}, t("Conexión")), kvUrl, kvAlt, kvModo, kvVer,
       h("div", { class: "btn-row" }, probarBtn, cambiarBtn, swapBtn))
   );
 
   /* ================= SEGURIDAD ================= */
-  const secSeg = h("section", { class: "sec" }, h("h3", {}, "Seguridad"));
+  const secSeg = h("section", { class: "sec" }, h("h3", {}, t("Seguridad")));
 
   if (origenInseguro(loadConfig().baseUrl)) {
     secSeg.append(
       h("div", { class: "warn" },
-        "⚠ Conexión por HTTP sin cifrar: la contraseña viaja visible por la red. Usa el QR con tunnel https.")
+        t("⚠ Conexión por HTTP sin cifrar: la contraseña viaja visible por la red. Usa el QR con tunnel https."))
     );
   }
 
   if (!pinSoportado()) {
     secSeg.append(
       h("p", { class: "hint" },
-        "PIN no disponible en este origen: Web Crypto requiere https o localhost (en LAN por http no existe).")
+        t("PIN no disponible en este origen: Web Crypto requiere https o localhost (en LAN por http no existe)."))
     );
   } else {
     const pinBox = h("div", { class: "pin-box" });
@@ -118,27 +119,27 @@ export async function settingsView(_params, root, _signal) {
     function pintarPin() {
       pinBox.textContent = "";
       if (hasPin()) {
-        const sel = h("select", { onChange: (e) => { setTimeoutMin(Number(e.target.value)); toast("Inactividad actualizada"); } },
+        const sel = h("select", { onChange: (e) => { setTimeoutMin(Number(e.target.value)); toast(t("Inactividad actualizada")); } },
           ...[1, 5, 10, 15, 30].map((m) =>
             h("option", { value: String(m), selected: lockCfg().timeout === m ? true : false },
-              `${m} minuto${m > 1 ? "s" : ""}`)
+              `${m} ${m > 1 ? t("minutos") : t("minuto")}`)
           )
         );
         pinBox.append(
-          h("p", { class: "hint" }, "🔒 Bloqueo con PIN activo."),
-          h("label", {}, "Cerrar por inactividad", sel),
+          h("p", { class: "hint" }, t("🔒 Bloqueo con PIN activo.")),
+          h("label", {}, t("Cerrar por inactividad"), sel),
           h("div", { class: "btn-row" },
-            h("button", { class: "ghost", onClick: () => { lockNow("manual"); toast("Bloqueado"); } }, "Bloquear ahora"),
+            h("button", { class: "ghost", onClick: () => { lockNow("manual"); toast(t("Bloqueado")); } }, t("Bloquear ahora")),
             h("button", {
               class: "danger",
               onClick: () => {
-                if (confirm("¿Desactivar el PIN de este dispositivo?")) {
+                if (confirm(t("¿Desactivar el PIN de este dispositivo?"))) {
                   clearPin();
                   pintarPin();
-                  toast("PIN desactivado");
+                  toast(t("PIN desactivado"));
                 }
               },
-            }, "Desactivar PIN"))
+            }, t("Desactivar PIN")))
         );
       } else {
         const input = h("input", {
@@ -146,30 +147,30 @@ export async function settingsView(_params, root, _signal) {
           inputmode: "numeric",
           minlength: "4",
           maxlength: "12",
-          placeholder: "4 a 12 caracteres",
+          placeholder: t("4 a 12 caracteres"),
           autocomplete: "new-password",
         });
         const activar = h("button", {
           class: "ghost",
           onClick: async () => {
             const v = input.value;
-            if (v.length < 4) return toast("PIN demasiado corto (mínimo 4)");
+            if (v.length < 4) return toast(t("PIN demasiado corto (mínimo 4)"));
             activar.disabled = true;
-            activar.textContent = "Guardando…";
+            activar.textContent = t("Guardando…");
             try {
               await setPin(v);
               pintarPin();
-              toast("PIN activado · se pedirá al abrir la app");
+              toast(t("PIN activado · se pedirá al abrir la app"));
             } finally {
               activar.disabled = false;
-              activar.textContent = "Activar PIN";
+              activar.textContent = t("Activar PIN");
             }
           },
-        }, "Activar PIN");
+        }, t("Activar PIN"));
         pinBox.append(
           h("p", { class: "hint" },
-            "PIN local del móvil (no es el del servidor): se guarda como hash PBKDF2, nunca en claro."),
-          h("label", {}, "Nuevo PIN", h("div", { class: "secret-wrap" }, input)),
+            t("PIN local del móvil (no es el del servidor): se guarda como hash PBKDF2, nunca en claro.")),
+          h("label", {}, t("Nuevo PIN"), h("div", { class: "secret-wrap" }, input)),
           h("div", { class: "btn-row" }, activar)
         );
       }
@@ -183,18 +184,18 @@ export async function settingsView(_params, root, _signal) {
       h("button", {
         class: "danger",
         onClick: () => {
-          if (!confirm("¿Cerrar sesión? Se borrará la contraseña guardada en este dispositivo.")) return;
+          if (!confirm(t("¿Cerrar sesión? Se borrará la contraseña guardada en este dispositivo."))) return;
           clearConfig();
-          toast("Sesión cerrada");
+          toast(t("Sesión cerrada"));
           navigate("/setup");
         },
-      }, "Cerrar sesión en este dispositivo"))
+      }, t("Cerrar sesión en este dispositivo")))
   );
 
   main.append(secSeg);
 
   /* ================= APARIENCIA ================= */
-  const ETIQUETAS = { auto: "Auto", claro: "Claro", oscuro: "Oscuro" };
+  const ETIQUETAS = { auto: t("Auto"), claro: t("Claro"), oscuro: t("Oscuro") };
   const botonesTema = TEMAS.map((t) =>
     h(
       "button",
@@ -212,9 +213,9 @@ export async function settingsView(_params, root, _signal) {
   botonesTema.forEach((b, i) => (b.dataset.tema = TEMAS[i]));
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, "Apariencia"),
-      h("p", { class: "hint" }, "«Auto» sigue el modo claro/oscuro del sistema."),
-      h("div", { class: "seg", role: "group", "aria-label": "Tema" }, ...botonesTema),
+    h("section", { class: "sec" }, h("h3", {}, t("Apariencia")),
+      h("p", { class: "hint" }, t("«Auto» sigue el modo claro/oscuro del sistema.")),
+      h("div", { class: "seg", role: "group", "aria-label": t("Tema") }, ...botonesTema),
       h("label", { class: "fila-toggle" },
         h("input", {
           type: "checkbox",
@@ -228,7 +229,20 @@ export async function settingsView(_params, root, _signal) {
             document.body.classList.toggle("compacto", e.target.checked);
           },
         }),
-        "Modo compacto (más mensajes en pantalla)"))
+        t("Modo compacto (más mensajes en pantalla)")),
+      /* Selector de idioma: al cambiarlo se recarga la vista para repintar
+         TODOS los textos (es una app sin framework de reactividad). */
+      h("label", { class: "fila-toggle" },
+        h("span", {}, t("Idioma")),
+        h("select", {
+          "aria-label": t("Idioma de la interfaz"),
+          onChange: (e) => {
+            setIdioma(e.target.value);
+            navigate("/settings");
+            location.reload();
+          },
+        }, ...IDIOMAS.map((i) =>
+          h("option", { value: i.id, selected: getIdioma() === i.id ? true : false }, i.nombre)))))
   );
 
   /* ================= NOTIFICACIONES ================= */
@@ -243,14 +257,14 @@ export async function settingsView(_params, root, _signal) {
     if (est === "no-soportado") {
       cajaNotif.append(
         h("p", { class: "hint" },
-          "Este navegador no soporta notificaciones. Usa el badge 🛡 de la lista y el banner del chat, que sí funcionan.")
+          t("Este navegador no soporta notificaciones. Usa el badge 🛡 de la lista y el banner del chat, que sí funcionan."))
       );
       return;
     }
     if (est === "inseguro") {
       cajaNotif.append(
         h("div", { class: "warn" },
-          "⚠ Las notificaciones necesitan HTTPS o localhost. Abre la app con el túnel https (QR) para activarlas.")
+          t("⚠ Las notificaciones necesitan HTTPS o localhost. Abre la app con el túnel https (QR) para activarlas."))
       );
       return;
     }
@@ -258,24 +272,24 @@ export async function settingsView(_params, root, _signal) {
     if (est === "ios-no-instalada") {
       cajaNotif.append(
         h("p", { class: "hint" },
-          "En iPhone/iPad, Apple solo permite notificar a las webs **instaladas**. Instálala y vuelve aquí:"),
+          t("En iPhone/iPad, Apple solo permite notificar a las webs **instaladas**. Instálala y vuelve aquí:")),
         h("ol", { class: "pasos" },
-          h("li", {}, "Pulsa **Compartir** (el cuadrado con la flecha) en Safari."),
-          h("li", {}, "Elige **«Añadir a pantalla de inicio»**."),
-          h("li", {}, "Abre la app desde el icono nuevo y activa aquí las notificaciones.")
+          h("li", {}, t("Pulsa **Compartir** (el cuadrado con la flecha) en Safari.")),
+          h("li", {}, t("Elige **«Añadir a pantalla de inicio»**.")),
+          h("li", {}, t("Abre la app desde el icono nuevo y activa aquí las notificaciones."))
         ),
         h("p", { class: "hint" },
-          "Aviso: aunque la instales, Apple **no permite** despertar la app en segundo plano, así que el aviso llega solo si acabas de dejar la app (unos segundos). El badge 🛡 y el banner del chat siempre funcionan.")
+          t("Aviso: aunque la instales, Apple **no permite** despertar la app en segundo plano, así que el aviso llega solo si acabas de dejar la app (unos segundos). El badge 🛡 y el banner del chat siempre funcionan."))
       );
       return;
     }
 
     const texto =
       est === "granted"
-        ? "Activadas: te avisaré cuando el agente pida un permiso y no estés mirando la app."
+        ? t("Activadas: te avisaré cuando el agente pida un permiso y no estés mirando la app.")
         : est === "denied"
-          ? "Bloqueadas por el navegador. Actívalas en los ajustes del sitio (icono junto a la URL) y recarga."
-          : "Desactivadas.";
+          ? t("Bloqueadas por el navegador. Actívalas en los ajustes del sitio (icono junto a la URL) y recarga.")
+          : t("Desactivadas.");
     cajaNotif.append(h("p", { class: "hint" }, texto));
 
     if (est !== "granted") {
@@ -286,31 +300,31 @@ export async function settingsView(_params, root, _signal) {
           pintarNotif();
           toast(
             r === "granted"
-              ? "Notificaciones activadas"
+              ? t("Notificaciones activadas")
               : r === "denied"
-                ? "Permiso denegado en el navegador"
-                : "Permiso no concedido"
+                ? t("Permiso denegado en el navegador")
+                : t("Permiso no concedido")
           );
         },
-      }, "Activar notificaciones");
+      }, t("Activar notificaciones"));
       cajaNotif.append(h("div", { class: "btn-row" }, btnAct));
     } else {
       const btnPrueba = h("button", {
         class: "ghost",
         onClick: async () => {
-          const ok = await notificar("OpenCode Móvil", "Prueba: así se verá el aviso de un permiso pendiente.", {
+          const ok = await notificar("OpenCode Móvil", t("Prueba: así se verá el aviso de un permiso pendiente."), {
             tag: "ocmovil-prueba",
             onClickUrl: location.origin + location.pathname + "#/permissions",
           });
-          if (!ok) toast("No se pudo mostrar la notificación");
+          if (!ok) toast(t("No se pudo mostrar la notificación"));
         },
-      }, "Probar notificación");
+      }, t("Probar notificación"));
       cajaNotif.append(h("div", { class: "btn-row" }, btnPrueba));
     }
 
     cajaNotif.append(
       h("p", { class: "hint" },
-        "Avisos solo en segundo plano y con permiso concedido. Android mantiene la app viva unos 30 s tras ocultarla; pasada esa ventana no puede avisar (sin servidor push).")
+        t("Avisos solo en segundo plano y con permiso concedido. Android mantiene la app viva unos 30 s tras ocultarla; pasada esa ventana no puede avisar (sin servidor push)."))
     );
   }
   pintarNotif();
@@ -328,44 +342,44 @@ export async function settingsView(_params, root, _signal) {
   const logPre = h("pre", { class: "err-log", hidden: true },
     errores.length
       ? errores.map((e) => `${new Date(e.t).toLocaleTimeString()} · ${e.where}: ${e.msg}`).join("\n")
-      : "Sin errores registrados.");
+      : t("Sin errores registrados."));
   const verBtn = h("button", {
     class: "ghost",
     onClick: () => { logPre.hidden = !logPre.hidden; },
-  }, `Errores locales (${errores.length})`);
+  }, t("Errores locales ({n})", { n: errores.length }));
   const limpiarBtn = h("button", {
     class: "ghost",
     onClick: () => {
       localStorage.removeItem(ERR_KEY);
-      logPre.textContent = "Sin errores registrados.";
-      verBtn.textContent = "Errores locales (0)";
-      toast("Log de errores limpiado");
+      logPre.textContent = t("Sin errores registrados.");
+      verBtn.textContent = t("Errores locales ({n})", { n: 0 });
+      toast(t("Log de errores limpiado"));
     },
-  }, "Limpiar log");
+  }, t("Limpiar log"));
   const cacheBtn = h("button", {
     class: "ghost",
     onClick: async () => {
       try {
         const keys = await caches.keys();
         await Promise.all(keys.filter((k) => k.startsWith("ocmovil-")).map((k) => caches.delete(k)));
-        toast("Caché vaciada · recargando");
+        toast(t("Caché vaciada · recargando"));
         setTimeout(() => location.reload(), 600);
       } catch {
-        toast("No se pudo vaciar la caché");
+        toast(t("No se pudo vaciar la caché"));
       }
     },
-  }, "Vaciar caché");
+  }, t("Vaciar caché"));
 
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, "Diagnóstico"),
+    h("section", { class: "sec" }, h("h3", {}, t("Diagnóstico")),
       h("div", { class: "btn-row" }, verBtn, limpiarBtn, cacheBtn),
       logPre)
   );
 
   /* ================= ACERCA DE ================= */
   main.append(
-    h("section", { class: "sec" }, h("h3", {}, "Acerca de"),
+    h("section", { class: "sec" }, h("h3", {}, t("Acerca de")),
       h("p", { class: "hint" },
-        "OpenCode Móvil · PWA sin frameworks (Vite + JS vanilla). Cliente de la API HTTP de opencode: sesiones, chat en streaming, permisos y bloqueo con PIN."))
+        t("OpenCode Móvil · PWA sin frameworks (Vite + JS vanilla). Cliente de la API HTTP de opencode: sesiones, chat en streaming, permisos y bloqueo con PIN.")))
   );
 }

@@ -3,6 +3,7 @@
 import { h, timeAgo, toast } from "../ui/dom.js";
 import { Client } from "../api/client.js";
 import { navigate } from "../ui/router.js";
+import { t } from "../i18n.js";
 
 const LAST_DIR_KEY = "ocmovil.lastDir";
 const ORDEN_KEY = "ocmovil.ordenSesiones";
@@ -11,7 +12,7 @@ export async function sessionsView(_params, root, signal) {
   const permBadge = h("span", { class: "perm-badge", hidden: true }, "0");
   const permBtn = h(
     "button",
-    { class: "icon-btn perm-btn", title: "Permisos pendientes", onClick: () => navigate("/permissions") },
+    { class: "icon-btn perm-btn", title: t("Permisos pendientes"), onClick: () => navigate("/permissions") },
     "🛡"
   );
   permBtn.append(permBadge);
@@ -20,9 +21,9 @@ export async function sessionsView(_params, root, signal) {
     h(
       "header",
       { class: "topbar" },
-      h("h1", {}, "Sesiones"),
+      h("h1", {}, t("Sesiones")),
       permBtn,
-      h("button", { class: "icon-btn", title: "Ajustes", onClick: () => navigate("/settings") }, "⚙")
+      h("button", { class: "icon-btn", title: t("Ajustes"), onClick: () => navigate("/settings") }, "⚙")
     )
   );
 
@@ -31,14 +32,14 @@ export async function sessionsView(_params, root, signal) {
   const buscar = h("input", {
     type: "search",
     class: "buscar",
-    placeholder: "Buscar sesión…",
+    placeholder: t("Buscar sesión…"),
     autocomplete: "off",
     spellcheck: "false",
   });
-  const ordenSel = h("select", { class: "orden", title: "Ordenar", "aria-label": "Ordenar sesiones" },
-    h("option", { value: "recientes" }, "Recientes"),
-    h("option", { value: "antiguas" }, "Antiguas"),
-    h("option", { value: "nombre" }, "Nombre")
+  const ordenSel = h("select", { class: "orden", title: t("Ordenar"), "aria-label": t("Ordenar") },
+    h("option", { value: "recientes" }, t("Recientes")),
+    h("option", { value: "antiguas" }, t("Antiguas")),
+    h("option", { value: "nombre" }, t("Nombre"))
   );
   const barra = h("div", { class: "lista-barra" }, buscar, ordenSel);
   root.append(barra);
@@ -47,27 +48,27 @@ export async function sessionsView(_params, root, signal) {
   const dirInput = h("input", {
     type: "text",
     name: "dir",
-    placeholder: "C:\\ruta\\del\\proyecto",
+    placeholder: t("C:\\ruta\\del\\proyecto"),
     autocomplete: "off",
     spellcheck: "false",
   });
-  const createBtn = h("button", { type: "submit" }, "Crear sesión");
+  const createBtn = h("button", { type: "submit" }, t("Crear sesión"));
   const newForm = h(
     "form",
     { class: "new-form" },
-    h("label", {}, "Carpeta del proyecto (en el PC)", dirInput),
+    h("label", {}, t("Carpeta del proyecto (en el PC)"), dirInput),
     createBtn
   );
   newForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const dir = dirInput.value.trim();
-    if (!dir) return toast("Indica la carpeta del proyecto");
+    if (!dir) return toast(t("Indica la carpeta del proyecto"));
     createBtn.disabled = true;
-    createBtn.textContent = "Creando…";
+    createBtn.textContent = t("Creando…");
     try {
       const created = await Client.createSession(dir);
       const id = created?.data?.id;
-      if (!id) throw new Error("Respuesta inesperada al crear la sesión");
+      if (!id) throw new Error(t("Respuesta inesperada al crear la sesión"));
       localStorage.setItem(LAST_DIR_KEY, dir);
       // Sin agente el run NUNCA arranca (hallazgo empirico); modelo por defecto
       // puede estar bloqueado (gemini en el insti) -> fijar modelo alcanzable.
@@ -87,20 +88,20 @@ export async function sessionsView(_params, root, signal) {
       }
       navigate(`/chat/${id}`);
     } catch (err) {
-      toast(err.message || "Error creando la sesión");
+      toast(err.message || t("Error creando la sesión"));
       createBtn.disabled = false;
-      createBtn.textContent = "Crear sesión";
+      createBtn.textContent = t("Crear sesión");
     }
   });
   newPanel.append(newForm);
 
   const list = h("ul", { class: "list" });
-  const loading = h("p", { class: "hint center" }, "Cargando…");
+  const loading = h("p", { class: "hint center" }, t("Cargando…"));
   const vacio = h(
     "div",
     { class: "empty-state", hidden: true },
-    h("p", { class: "empty-title" }, "Todavía no hay sesiones"),
-    h("p", { class: "hint" }, "Pulsa + para crear la primera en la carpeta de tu proyecto.")
+    h("p", { class: "empty-title" }, t("Todavía no hay sesiones")),
+    h("p", { class: "hint" }, t("Pulsa + para crear la primera en la carpeta de tu proyecto."))
   );
   root.append(newPanel, loading, vacio, list);
 
@@ -153,11 +154,11 @@ export async function sessionsView(_params, root, signal) {
     vacio.hidden = filas.length > 0;
     if (!filas.length && buscar.value.trim()) {
       // hay busqueda y no hay resultados: mensaje especifico
-      vacio.querySelector(".empty-title").textContent = "Sin resultados";
-      vacio.querySelector(".hint").textContent = "Prueba con otro texto o borra la búsqueda.";
+      vacio.querySelector(".empty-title").textContent = t("Sin resultados");
+      vacio.querySelector(".hint").textContent = t("Prueba con otro texto o borra la búsqueda.");
     } else {
-      vacio.querySelector(".empty-title").textContent = "Todavía no hay sesiones";
-      vacio.querySelector(".hint").textContent = "Pulsa + para crear la primera en la carpeta de tu proyecto.";
+      vacio.querySelector(".empty-title").textContent = t("Todavía no hay sesiones");
+      vacio.querySelector(".hint").textContent = t("Pulsa + para crear la primera en la carpeta de tu proyecto.");
     }
     const scroll = list.scrollTop;
     list.textContent = "";
@@ -206,10 +207,10 @@ export async function sessionsView(_params, root, signal) {
       pintarBadge(perms.length);
     } catch (err) {
       if (err.isAuth) {
-        toast("Credencial caducada: vuelve a emparejar");
+        toast(t("Credencial caducada: vuelve a emparejar"));
         navigate("/setup");
       } else {
-        loading.textContent = err.message || "Error cargando sesiones";
+        loading.textContent = err.message || t("Error cargando sesiones");
       }
     }
   }

@@ -10,6 +10,7 @@
    crypto.subtle -> la app lo degrada con aviso en Ajustes en vez de romper. */
 import { h } from "./ui/dom.js";
 import { clearConfig } from "./config.js";
+import { t } from "./i18n.js";
 
 const LOCK_KEY = "ocmovil.lock";
 const ITER = 150000;
@@ -147,23 +148,23 @@ function construirOverlay() {
     autocomplete: "off",
     spellcheck: "false",
     placeholder: "PIN",
-    "aria-label": "PIN del dispositivo",
+    "aria-label": t("PIN del dispositivo"),
   });
   err = h("p", { class: "error", hidden: true });
-  btn = h("button", { type: "submit" }, "Desbloquear");
+  btn = h("button", { type: "submit" }, t("Desbloquear"));
   const form = h(
     "form",
     { class: "lock-card" },
     h("div", { class: "logo" }, "OC"),
-    h("h2", {}, "Bloqueado"),
-    h("p", { class: "hint" }, "Introduce el PIN del dispositivo"),
+    h("h2", {}, t("Bloqueado")),
+    h("p", { class: "hint" }, t("Introduce el PIN del dispositivo")),
     input,
     err,
     btn,
     h(
       "button",
       { class: "link-btn", type: "button", onClick: borrarEmergencia },
-      "¿Olvidaste el PIN? Borrar datos del dispositivo"
+      t("¿Olvidaste el PIN? Borrar datos del dispositivo")
     )
   );
   form.addEventListener("submit", (e) => {
@@ -178,36 +179,36 @@ function construirOverlay() {
 async function intentar() {
   if (!pinSoportado()) return;
   btn.disabled = true;
-  btn.textContent = "Comprobando…";
+  btn.textContent = t("Comprobando…");
   try {
     const r = await verifyPin(input.value);
     if (r.ok) return desbloquear();
     if (r.error) {
-      err.textContent = "Error interno comprobando el PIN";
+      err.textContent = t("Error interno comprobando el PIN");
       err.hidden = false;
     } else if (r.espera > 0) {
-      err.textContent = `Demasiados intentos: espera ${r.espera} s`;
+      err.textContent = t("Demasiados intentos: espera {s} s", { s: r.espera });
       err.hidden = false;
       setTimeout(() => {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "Desbloquear";
+          btn.textContent = t("Desbloquear");
         }
       }, r.espera * 1000);
       return; // deshabilitado mientras dure el cooldown
     } else {
-      err.textContent = `PIN incorrecto (${r.fails}º intento)`;
+      err.textContent = t("PIN incorrecto ({n}º intento)", { n: r.fails });
       err.hidden = false;
     }
     input.value = "";
     input.focus();
     btn.disabled = false;
-    btn.textContent = "Desbloquear";
+    btn.textContent = t("Desbloquear");
   } catch {
-    err.textContent = "Error comprobando el PIN";
+    err.textContent = t("Error comprobando el PIN");
     err.hidden = false;
     btn.disabled = false;
-    btn.textContent = "Desbloquear";
+    btn.textContent = t("Desbloquear");
   }
 }
 
@@ -228,7 +229,7 @@ function desbloquear() {
 }
 
 function borrarEmergencia() {
-  if (!confirm("Se borraran el PIN y la contraseña guardada en este dispositivo. ¿Continuar?")) {
+  if (!confirm(t("Se borraran el PIN y la contraseña guardada en este dispositivo. ¿Continuar?"))) {
     return;
   }
   clearPin();
@@ -245,9 +246,9 @@ export function lockNow(motivo = "") {
   if (err) {
     err.textContent =
       motivo === "inactividad"
-        ? "Bloqueado por inactividad"
+        ? t("Bloqueado por inactividad")
         : motivo === "background"
-          ? "Bloqueado: la app paso a segundo plano"
+          ? t("Bloqueado: la app paso a segundo plano")
           : "";
     err.hidden = !err.textContent;
   }

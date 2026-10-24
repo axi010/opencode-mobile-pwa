@@ -12,6 +12,7 @@
 import { Client } from "./api/client.js";
 import { notificar, estado } from "./notify.js";
 import { loadConfig } from "./config.js";
+import { t } from "./i18n.js";
 
 const VISTOS_KEY = "ocmovil.permVistos";
 const INTERVALO = 20000;
@@ -80,9 +81,9 @@ export async function chequearPermisos() {
   const primero = nuevos[0];
   const cuerpo =
     n === 1
-      ? `${primero.action || "permiso"}: ${(primero.resources || []).join(", ").slice(0, 90)}`
-      : `${n} peticiones del agente esperando tu decisión`;
-  await notificar("OpenCode · permiso pendiente", cuerpo, {
+      ? `${primero.action || t("Permiso")}: ${(primero.resources || []).join(", ").slice(0, 90)}`
+      : t("{n} peticiones del agente esperando tu decisión", { n });
+  await notificar(t("OpenCode · permiso pendiente"), cuerpo, {
     tag: "ocmovil-permiso",
     onClickUrl: location.origin + location.pathname + "#/permissions",
   });

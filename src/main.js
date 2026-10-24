@@ -7,6 +7,7 @@ import { initSecurity } from "./security.js";
 import { initTheme } from "./theme.js";
 import { iniciarVigilantePermisos, marcarPendientesComoVistos } from "./permisos-avisos.js";
 import { esIOS, esInstalada } from "./notify.js";
+import { initIdioma, t } from "./i18n.js";
 import { setupView } from "./views/setup.js";
 import { sessionsView } from "./views/sessions.js";
 import { chatView } from "./views/chat.js";
@@ -42,6 +43,9 @@ if (forzarSetup) {
 /* Tema ANTES de arrancar el router (la app pinta tras el JS: sin parpadeo). */
 initTheme();
 
+// Idioma ANTES del router: asi las vistas ya se pintan en el idioma correcto.
+initIdioma();
+
 // Modo compacto del chat (preferencia de apariencia persistida).
 try {
   if (localStorage.getItem("ocmovil.compacto") === "1") {
@@ -72,13 +76,11 @@ function mostrarAvisoInstalarIOS() {
     const tip = document.createElement("div");
     tip.className = "ios-tip";
     tip.append(
-      document.createTextNode(
-        "📲 Para instalarla: Compartir → «Añadir a pantalla de inicio». Así funcionan el PIN y las notificaciones."
-      )
+      document.createTextNode(t("📲 Para instalarla: Compartir → «Añadir a pantalla de inicio». Así funcionan el PIN y las notificaciones."))
     );
     const x = document.createElement("button");
     x.type = "button";
-    x.setAttribute("aria-label", "Cerrar aviso");
+    x.setAttribute("aria-label", t("Cerrar aviso"));
     x.textContent = "✕";
     x.addEventListener("click", () => {
       localStorage.setItem("ocmovil.iosTipVisto", "1");

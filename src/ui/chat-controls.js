@@ -10,6 +10,7 @@
    Los cambios afectan SOLO a la sesion abierta (decision del usuario). */
 import { h, toast } from "./dom.js";
 import { Client } from "../api/client.js";
+import { t } from "../i18n.js";
 
 const RECIENTES_KEY = "ocmovil.modelosRecientes";
 const CARPETA_KEY = "ocmovil.ultimaCarpeta";
@@ -81,14 +82,14 @@ export function crearControles({ sessionID, onArchivos }) {
   const btnBuild = h("button", { type: "button", class: "seg-btn", onClick: () => setModo("build") }, "Build");
   const segModo = h("div", { class: "seg-mini", role: "group", "aria-label": "Modo" }, btnPlan, btnBuild);
 
-  const lblModelo = h("span", { class: "chip-label" }, "modelo…");
+  const lblModelo = h("span", { class: "chip-label" }, t("modelo…"));
   const btnModelo = h("button", {
-    type: "button", class: "chip", title: "Modelo y variante",
+    type: "button", class: "chip", title: t("Modelo y variante"),
     onClick: () => abrirModelos(),
   }, lblModelo, h("span", { class: "chip-caret" }, "▾"));
 
   const btnAdjuntar = h("button", {
-    type: "button", class: "chip", title: "Adjuntar archivos del PC",
+    type: "button", class: "chip", title: t("Adjuntar archivos del PC"),
     onClick: () => abrirArchivos(),
   }, "📎");
 
@@ -104,7 +105,7 @@ export function crearControles({ sessionID, onArchivos }) {
   }
   function pintarModelo() {
     if (!modelo) {
-      lblModelo.textContent = "modelo…";
+      lblModelo.textContent = t("modelo…");
       return;
     }
     const v = modelo.variant && modelo.variant !== "default" ? ` · ${modelo.variant}` : "";
@@ -118,11 +119,11 @@ export function crearControles({ sessionID, onArchivos }) {
     pintarModo();
     try {
       await Client.setAgent(sessionID, nuevo);
-      toast(nuevo === "plan" ? "Modo PLAN (solo lectura)" : "Modo BUILD (puede editar)");
+      toast(nuevo === "plan" ? t("Modo PLAN (solo lectura)") : t("Modo BUILD (puede editar)"));
     } catch (err) {
       modo = previo;
       pintarModo();
-      toast(err.message || "No se pudo cambiar el modo");
+      toast(err.message || t("No se pudo cambiar el modo"));
     }
   }
 
@@ -133,30 +134,30 @@ export function crearControles({ sessionID, onArchivos }) {
     try {
       await Client.setModel(sessionID, { id, providerID, ...(variant ? { variant } : {}) });
       guardarReciente(id, providerID, variant);
-      toast(`Modelo: ${id}${variant && variant !== "default" ? ` (${variant})` : ""}`);
+      toast(`${t("Modelo:")} ${id}${variant && variant !== "default" ? ` (${variant})` : ""}`);
     } catch (err) {
       modelo = previo;
       pintarModelo();
-      toast(err.message || "No se pudo cambiar el modelo");
+      toast(err.message || t("No se pudo cambiar el modelo"));
     }
   }
 
   /* ---------- hoja de MODELOS ---------- */
   async function abrirModelos() {
-    const cuerpo = h("div", { class: "sheet-body" }, h("p", { class: "hint" }, "Cargando modelos…"));
-    const { hoja } = hojaInferior("Modelo y variante", cuerpo);
+    const cuerpo = h("div", { class: "sheet-body" }, h("p", { class: "hint" }, t("Cargando modelos…")));
+    const { hoja } = hojaInferior(t("Modelo y variante"), cuerpo);
 
     let modelos;
     try {
       modelos = await cargarModelos();
     } catch (err) {
       cuerpo.textContent = "";
-      cuerpo.append(h("p", { class: "error" }, err.message || "No se pudo cargar el catálogo"));
+      cuerpo.append(h("p", { class: "error" }, err.message || t("No se pudo cargar el catálogo")));
       return;
     }
 
     const buscador = h("input", {
-      type: "search", placeholder: "Buscar modelo o proveedor…",
+      type: "search", placeholder: t("Buscar modelo o proveedor…"),
       autocomplete: "off", spellcheck: "false",
     });
     const lista = h("div", { class: "model-list" });
@@ -175,7 +176,7 @@ export function crearControles({ sessionID, onArchivos }) {
 
       // atajos: recientes (solo sin filtro)
       if (!q && recientes.length) {
-        lista.append(h("div", { class: "model-group" }, "Recientes"));
+        lista.append(h("div", { class: "model-group" }, t("Recientes")));
         for (const clave of recientes) {
           const [prov, resto] = clave.split("/");
           const [id, variant] = (resto || "").split("#");
@@ -194,7 +195,7 @@ export function crearControles({ sessionID, onArchivos }) {
         for (const m of items.slice(0, 60)) lista.append(filaModelo(m));
       }
       if (!lista.children.length) {
-        lista.append(h("p", { class: "hint center" }, "Sin resultados"));
+        lista.append(h("p", { class: "hint center" }, t("Sin resultados")));
       }
     }
 
@@ -210,7 +211,7 @@ export function crearControles({ sessionID, onArchivos }) {
               const sub = fila.querySelector(".model-variants");
               if (sub) { sub.hidden = !sub.hidden; return; }
               const sub2 = h("div", { class: "model-variants" },
-                h("button", { type: "button", class: "var-btn", onClick: () => elegir(m, null) }, "por defecto"),
+                h("button", { type: "button", class: "var-btn", onClick: () => elegir(m, null) }, t("por defecto")),
                 ...variantes.map((v) =>
                   h("button", { type: "button", class: "var-btn", onClick: () => elegir(m, v) }, v)));
               fila.append(sub2);
@@ -220,7 +221,7 @@ export function crearControles({ sessionID, onArchivos }) {
           },
         },
           h("span", { class: "model-name" }, m.name || m.id),
-          h("span", { class: "model-id" }, `${m.id}${variantes.length > 1 ? ` · ${variantes.length} variantes` : ""}`),
+          h("span", { class: "model-id" }, `${m.id}${variantes.length > 1 ? ` · ${variantes.length} ${t("variantes")}` : ""}`),
           actual ? h("span", { class: "model-actual" }, "✓") : null)
       );
       return fila;
@@ -257,10 +258,10 @@ export function crearControles({ sessionID, onArchivos }) {
 
     const migas = h("div", { class: "crumbs" });
     const fuera = h("div", { class: "aviso-fuera", hidden: true },
-      "⚠ Estás fuera de la carpeta del proyecto: revisa la ruta antes de adjuntar.");
+      t("⚠ Estás fuera de la carpeta del proyecto: revisa la ruta antes de adjuntar."));
     const lista = h("div", { class: "file-list" });
     const cuerpo = h("div", { class: "sheet-body" }, migas, fuera, lista);
-    const { hoja } = hojaInferior("Adjuntar archivos del PC", cuerpo);
+    const { hoja } = hojaInferior(t("Adjuntar archivos del PC"), cuerpo);
 
     let dir = raiz;
     let home = ""; // prefijo de las rutas que devuelve fs/list (relativas al home)
@@ -274,7 +275,7 @@ export function crearControles({ sessionID, onArchivos }) {
 
     async function navegar(nuevaRuta) {
       lista.textContent = "";
-      lista.append(h("p", { class: "hint center" }, "Cargando…"));
+      lista.append(h("p", { class: "hint center" }, t("Cargando…")));
       const ruta = String(nuevaRuta).replace(/[\\/]+$/, "") || nuevaRuta; // sin barra final
       try {
         const r = await Client.fsList(ruta);
@@ -297,10 +298,10 @@ export function crearControles({ sessionID, onArchivos }) {
           .filter((e) => !IGNORAR.test(nombreDe(e.path)))
           .sort((a, b) => (a.type === b.type ? nombreDe(a.path).localeCompare(nombreDe(b.path)) : a.type === "directory" ? -1 : 1));
         for (const e of entradas) lista.append(filaEntrada(e));
-        if (!entradas.length) lista.append(h("p", { class: "hint center" }, "Carpeta vacía"));
+        if (!entradas.length) lista.append(h("p", { class: "hint center" }, t("Carpeta vacía")));
       } catch (err) {
         lista.textContent = "";
-        lista.append(h("p", { class: "error" }, err.message || "No se pudo abrir la carpeta"));
+        lista.append(h("p", { class: "error" }, err.message || t("No se pudo abrir la carpeta")));
       }
     }
 
@@ -329,15 +330,15 @@ export function crearControles({ sessionID, onArchivos }) {
     }
 
     const barra = h("div", { class: "sheet-foot" },
-      h("span", { class: "hint" }, "Elige los archivos del PC y pulsa Adjuntar"),
+      h("span", { class: "hint" }, t("Elige los archivos del PC y pulsa Adjuntar")),
       h("button", {
         type: "button", class: "ghost",
         onClick: () => {
-          if (!elegidos.length) return toast("No has elegido ningún archivo");
+          if (!elegidos.length) return toast(t("No has elegido ningún archivo"));
           onArchivos(elegidos.map((p) => ({ uri: rutaAFileUri(p), name: nombreDe(p) })));
           hoja.remove();
         },
-      }, "Adjuntar"));
+      }, t("Adjuntar")));
     cuerpo.append(barra);
 
     // retomar donde lo dejaste (si la carpeta ya no existe, se cae a la raiz)

@@ -10,6 +10,7 @@ import { loadConfig, saveConfig, consumeQrParams } from "../config.js";
 import { Client, detectarProxy } from "../api/client.js";
 import { vigilarDesdeAhora } from "../permisos-avisos.js";
 import { navigate } from "../ui/router.js";
+import { t } from "../i18n.js";
 
 function esLoopback(host) {
   return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
@@ -36,7 +37,7 @@ export async function setupView(_params, root, _signal) {
     name: "url",
     value: loadConfig().baseUrl,
     required: true,
-    placeholder: loadConfig().baseUrl ? "" : "URL del tunnel (la da el QR) o http://127.0.0.1:28894 en el PC",
+    placeholder: loadConfig().baseUrl ? "" : t("URL del tunnel (la da el QR) o http://127.0.0.1:28894 en el PC"),
     inputmode: "url",
     autocomplete: "off",
     spellcheck: "false",
@@ -45,7 +46,7 @@ export async function setupView(_params, root, _signal) {
   const secretInput = h("input", {
     type: "password",
     name: "secret",
-    placeholder: "Contraseña del servidor o enlace de pairing",
+    placeholder: t("Contraseña del servidor o enlace de pairing"),
     autocomplete: "off",
     spellcheck: "false",
   });
@@ -54,7 +55,7 @@ export async function setupView(_params, root, _signal) {
     {
       class: "ojo",
       type: "button",
-      title: "Mostrar u ocultar",
+      title: t("Mostrar u ocultar"),
       onClick: () => {
         const ver = secretInput.type === "password";
         secretInput.type = ver ? "text" : "password";
@@ -70,30 +71,30 @@ export async function setupView(_params, root, _signal) {
     const inseguro = origenInseguro(urlInput.value.trim() || loadConfig().baseUrl);
     warn.hidden = !inseguro;
     warn.textContent = inseguro
-      ? "⚠ Conexión insegura (HTTP): la contraseña viaja por la red sin cifrar. Usa el QR con el tunnel https cuando puedas."
+      ? t("⚠ Conexión insegura (HTTP): la contraseña viaja por la red sin cifrar. Usa el QR con el tunnel https cuando puedas.")
       : "";
   }
   urlInput.addEventListener("input", actualizarWarn);
 
   const errorEl = h("p", { class: "error", hidden: true });
-  const btn = h("button", { type: "submit" }, "Conectar");
+  const btn = h("button", { type: "submit" }, t("Conectar"));
 
   /* Flujo unico de conexion: recibe el secreto (contraseña, codigo de pairing
      o token ya canjeado si raw=true). */
   async function connect(secret, { raw = false } = {}) {
     errorEl.hidden = true;
     btn.disabled = true;
-    btn.textContent = "Conectando…";
+    btn.textContent = t("Conectando…");
     const baseUrl = urlInput.value.trim().replace(/\/+$/, "");
     saveConfig({ baseUrl });
     try {
-      if (!secret) throw new Error("Introduce la contraseña o el enlace de pairing");
+      if (!secret) throw new Error(t("Introduce la contraseña o el enlace de pairing"));
       let password = secret;
       if (!raw) {
         const caducado = () => {
           // 404/401 = codigo expirado (~5 min) o ya consumido
           throw new Error(
-            "El código de pairing ha caducado o ya se usó (~5 min). Genera otro QR con «node scripts/qr-pairing.mjs» y escanéalo."
+            t("El código de pairing ha caducado o ya se usó (~5 min). Genera otro QR con «node scripts/qr-pairing.mjs» y escanéalo.")
           );
         };
         const idx = secret.indexOf("/auth/connect/");
@@ -118,7 +119,7 @@ export async function setupView(_params, root, _signal) {
         const esLocal = esLoopback(location.hostname);
         if (!esLocal) {
           throw new Error(
-            "Este servidor no ofrece el proxy /api: desde un origen externo (túnel/LAN) el navegador bloqueará las peticiones. Sirve la app con «npm run preview» (incluye el proxy) o ábrela en localhost."
+            t("Este servidor no ofrece el proxy /api: desde un origen externo (túnel/LAN) el navegador bloqueará las peticiones. Sirve la app con «npm run preview» (incluye el proxy) o ábrela en localhost.")
           );
         }
       }
@@ -127,7 +128,7 @@ export async function setupView(_params, root, _signal) {
       // principal falla de red, api() reintenta con esta automáticamente.
       const alt = (info.urls || []).find((u) => u.startsWith("https://") && u !== baseUrl);
       if (alt) saveConfig({ altUrl: alt.replace(/\/+$/, "") });
-      toast(`Conectado · opencode v${info.version}`);
+      toast(t("Conectado · opencode v{version}", { version: info.version }));
       // Ya hay credenciales: el vigilante puede empezar a trabajar.
       vigilarDesdeAhora();
       history.replaceState(null, "", location.pathname + "#/sessions");
@@ -137,10 +138,10 @@ export async function setupView(_params, root, _signal) {
       // devolver el secreto al campo para poder reintentar sin reescanear
       // (la URL ya fue limpiada por consumeQrParams)
       if (secret) secretInput.value = secret;
-      errorEl.textContent = err.message || "Error de conexión";
+      errorEl.textContent = err.message || t("Error de conexión");
       errorEl.hidden = false;
       btn.disabled = false;
-      btn.textContent = "Conectar";
+      btn.textContent = t("Conectar");
     }
   }
 
@@ -149,18 +150,18 @@ export async function setupView(_params, root, _signal) {
     { class: "setup-form" },
     h("div", { class: "brand" }, h("span", { class: "logo" }, "OC"), "OpenCode Móvil"),
     warn,
-    h("label", {}, "Servidor", urlInput),
-    h("label", {}, "Acceso", secretWrap),
+    h("label", {}, t("Servidor"), urlInput),
+    h("label", {}, t("Acceso"), secretWrap),
     errorEl,
     btn,
     h(
       "p",
       { class: "hint" },
-      "En el PC ejecuta ",
+      t("En el PC ejecuta "),
       h("code", {}, "node scripts/qr-pairing.mjs"),
-      " y escanea el QR. Alternativa manual: ",
+      t(" y escanea el QR. Alternativa manual: "),
       h("code", {}, "opencode pair"),
-      " o la contraseña del servidor."
+      t(" o la contraseña del servidor.")
     )
   );
   form.addEventListener("submit", (e) => {
@@ -174,11 +175,11 @@ export async function setupView(_params, root, _signal) {
   // Auto-conexion desde el QR (los params ya fueron capturados y retirados)
   if (tokenParam) {
     // QR con token precanjeado: un solo escaneo, valido 30 dias
-    toast("Token detectado · conectando…");
+    toast(t("Token detectado · conectando…"));
     connect(tokenParam, { raw: true });
   } else if (pairParam) {
     // QR con codigo de pairing de un solo uso (caduca en ~5 min)
-    toast("Código de pairing detectado · emparejando…");
+    toast(t("Código de pairing detectado · emparejando…"));
     connect(`/auth/connect/${pairParam}`);
   }
 }

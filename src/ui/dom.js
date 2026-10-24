@@ -1,4 +1,5 @@
 /* Helpers DOM + render minimo de markdown (seguro: siempre se escapa). */
+import { t } from "../i18n.js";
 
 export function h(tag, attrs = {}, ...children) {
   const el = document.createElement(tag);
@@ -56,7 +57,7 @@ function bloqueCodigo(lang, code) {
   return (
     `<div class="code-block"><div class="code-head">` +
     `<span class="code-lang">${lang}</span>` +
-    `<button type="button" class="copy-btn">Copiar</button></div>` +
+    `<button type="button" class="copy-btn">${t("Copiar")}</button></div>` +
     `<pre>${code}</pre></div>`
   );
 }
@@ -134,10 +135,10 @@ export function renderMarkdown(text) {
 
 export function timeAgo(ts) {
   const s = Math.max(0, (Date.now() - ts) / 1000);
-  if (s < 60) return "ahora";
-  if (s < 3600) return `hace ${Math.floor(s / 60)} min`;
-  if (s < 86400) return `hace ${Math.floor(s / 3600)} h`;
-  return `hace ${Math.floor(s / 86400)} d`;
+  if (s < 60) return t("ahora");
+  if (s < 3600) return t("hace {n} min", { n: Math.floor(s / 60) });
+  if (s < 86400) return t("hace {n} h", { n: Math.floor(s / 3600) });
+  return t("hace {n} d", { n: Math.floor(s / 86400) });
 }
 
 let toastTimer = null;
