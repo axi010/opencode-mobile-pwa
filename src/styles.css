@@ -212,6 +212,17 @@ mark.resaltado.activa {
   color: var(--on-accent);
 }
 
+/* ---- banner de DEMO (solo en la demo publica) ---- */
+.demo-banner {
+  background: linear-gradient(90deg, #1f6feb, #8957e5);
+  color: #fff;
+  font-size: 0.76rem;
+  text-align: center;
+  padding: 6px 10px;
+  line-height: 1.35;
+}
+.demo-banner b { font-weight: 700; }
+
 /* ---- vista Sistema (MCP, plugins, skills...) ---- */
 .sys-lista { display: flex; flex-direction: column; }
 .sys-row {

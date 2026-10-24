@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https: http://127.0.0.1:* http://localhost:*; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#0d1117" />
+    <!-- Nunca enviar el Referer: la URL puede llevar params de acceso del QR. -->
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content="Cliente movil para opencode: chatea con tus sesiones desde el telefono." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="./icon-192.png" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Nombre bajo el icono en iOS (si falta, iOS usa el <title> completo) -->
+    <meta name="apple-mobile-web-app-title" content="OC Móvil" />
+    <!-- iOS usa el color de la barra de estado del manifest; se refuerza aqui -->
+    <meta name="format-detection" content="telephone=no" />
+    <title>OpenCode Móvil</title>
+    <script src="./mock.js"></script>
+    <script type="module" crossorigin src="./assets/index-CQpWOyRw.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BT2NBm5K.css">
+  </head>
+  <body>
+    <div id="app" aria-live="polite"></div>
+    <div id="toast" hidden></div>
+  </body>
+</html>

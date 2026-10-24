@@ -27,6 +27,8 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Real-time chat** with streaming responses (SSE), reasoning, tool chips and a stop button.
 - **Search** inside a conversation (highlight + jump between matches) and **copy the whole chat as Markdown**.
 - **Session list with search and sorting** (recent / oldest / name).
+- **System view**: MCP servers (connect/disconnect), model providers, plugins, skills and commands.
+- **Bilingual UI** (Spanish / English), auto-detected from your browser.
 - **Resilient connection**: the event stream reconnects with **exponential back-off** (1 s → 30 s + jitter).
 - **Permission control**: approve or reject what the agent asks for (**once / always / reject**), right from your phone. Live banner in the chat, badge counter in the session list and a dedicated screen.
 - **Plan / Build mode switch**: flip the agent's mode with one tap.
@@ -194,6 +196,8 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Chat en tiempo real** con respuestas en streaming (SSE), razonamiento, chips de herramientas y botón de detener.
 - **Buscar dentro de la conversación** (resalta y salta entre coincidencias) y **copiar todo el chat en Markdown**.
 - **Lista de sesiones con buscador y orden** (recientes / antiguas / nombre).
+- **Vista Sistema**: servidores MCP (conectar/desconectar), proveedores de modelos, plugins, skills y comandos.
+- **Interfaz bilingüe** (español / inglés), detectada automáticamente del navegador.
 - **Conexión resistente**: el stream se reconecta con **backoff exponencial** (1 s → 30 s + jitter).
 - **Control de permisos**: aprueba o rechaza lo que pide el agente (**una vez / siempre / rechazar**) desde el móvil. Banner en vivo en el chat, contador en la lista de sesiones y pantalla propia.
 - **Conmutador Plan / Build**: cambia el modo del agente con un toque.
