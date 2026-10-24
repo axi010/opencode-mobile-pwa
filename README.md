@@ -16,9 +16,25 @@
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
+▶️ **[Try the live demo](https://axi010.github.io/opencode-mobile-pwa/)** — fake data, nothing to install.
+
+<p align="center">
+  <img src="screenshots/sessions.png" width="250" alt="Sessions list with search and sort" />
+  <img src="screenshots/chat.png" width="250" alt="Chat with permissions banner, Plan/Build switch and model picker" />
+  <img src="screenshots/permissions.png" width="250" alt="Approve or reject agent permissions" />
+</p>
+
 A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) server from your phone: chat with your sessions in real time, approve permissions, pick the model, browse your project's files and attach them, all from a tiny, dependency-free client.
 
 > **Español:** [Ir a la versión en español](#-español)
+
+▶️ **[Prueba la demo](https://axi010.github.io/opencode-mobile-pwa/)** — datos ficticios, sin instalar nada.
+
+<p align="center">
+  <img src="screenshots/sessions.png" width="250" alt="Lista de sesiones con buscador y orden" />
+  <img src="screenshots/chat.png" width="250" alt="Chat con banner de permisos, Plan/Build y selector de modelo" />
+  <img src="screenshots/permissions.png" width="250" alt="Aprobar o rechazar permisos del agente" />
+</p>
 
 ---
 
@@ -37,17 +53,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Security**: strict CSP in production, **PIN lock** (PBKDF2, brute-force cooldown, auto-lock on inactivity), QR token scrubbing from the URL, "log out" button.
 - **Light / dark / auto theme**, following your system.
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
-- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~45 kB gzipped.
-
-## 📱 Screenshots
-
-| Sessions | Chat | Permissions |
-| --- | --- | --- |
-| ![Sessions](screenshots/sessions.png) | ![Chat](screenshots/chat.png) | ![Permissions](screenshots/permissions.png) |
-
-> Screenshots show **fictional demo data**. The app itself stores nothing but your
-> own credential on your device.
-
+- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~50 kB gzipped.
 
 ## 📱 Platform support
 
@@ -78,6 +84,10 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - Node.js 18+ to build and serve the PWA.
 
 ## 🚀 Quick start
+
+**Just want to look?** → [live demo](https://axi010.github.io/opencode-mobile-pwa/) (fake data, no install).
+
+**Want to use it for real?** You need an **opencode** server running on your PC:
 
 ```bash
 git clone <this-repo>
@@ -206,7 +216,7 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Seguridad**: CSP estricta en producción, **bloqueo con PIN** (PBKDF2, cooldown antifuerza bruta, cierre por inactividad), borrado del token del QR en la URL y botón de cerrar sesión.
 - **Tema claro / oscuro / automático**, siguiendo al sistema.
 - **Notificaciones locales** cuando el agente pide un permiso y no estás mirando la app.
-- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 45 kB comprimidos.
+- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 50 kB comprimidos.
 
 ## 📱 Compatibilidad de plataformas
 
@@ -238,6 +248,10 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - Node.js 18+ para compilar y servir la PWA.
 
 ## 🚀 Puesta en marcha
+
+**¿Solo quieres verla?** → [demo](https://axi010.github.io/opencode-mobile-pwa/) (datos ficticios, sin instalar).
+
+**¿Quieres usarla de verdad?** Necesitas un servidor **opencode** en tu PC:
 
 ```bash
 git clone <este-repo>
