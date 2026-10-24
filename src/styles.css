@@ -185,6 +185,44 @@ input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 .new-form { display: flex; flex-direction: column; gap: 10px; }
 .new-form label { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--muted); }
 
+/* ---- busqueda dentro de la conversacion ---- */
+.chat-buscar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--bg3);
+}
+.chat-buscar .buscar-chat { flex: 1; min-width: 0; }
+.cuenta-chat {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+mark.resaltado {
+  background: #f0b429;
+  color: #1f2328;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+mark.resaltado.activa {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ---- barra de busqueda + orden (lista de sesiones) ---- */
+.lista-barra {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--bg3);
+}
+.lista-barra .buscar { flex: 1; min-width: 0; }
+.lista-barra .orden { flex: 0 0 auto; width: auto; max-width: 42%; padding: 10px; }
+
 /* ---- chat ---- */
 .banner {
   background: var(--banner-bg);

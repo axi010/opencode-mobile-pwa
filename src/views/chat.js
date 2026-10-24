@@ -20,10 +20,38 @@ export async function chatView(params, root, signal) {
         Client.interrupt(sessionID).catch((e) => toast(e.message)) },
     "■"
   );
+
+  /* Buscador de la conversacion (el input vive en la fila de abajo; el boton,
+     en la barra superior). Se declara ANTES del header porque el header lo usa. */
+  const buscarChat = h("input", {
+    type: "search",
+    class: "buscar-chat",
+    placeholder: "Buscar en la conversación…",
+    autocomplete: "off",
+    spellcheck: "false",
+    hidden: true,
+  });
+  const cuentaChat = h("span", { class: "cuenta-chat", hidden: true });
+  const btnBuscar = h("button", {
+    type: "button",
+    class: "icon-btn",
+    title: "Buscar en la conversación",
+    "aria-label": "Buscar en la conversación",
+    onClick: () => {
+      buscarChat.hidden = !buscarChat.hidden;
+      if (!buscarChat.hidden) buscarChat.focus();
+      else {
+        buscarChat.value = "";
+        aplicarBusquedaChat();
+      }
+    },
+  }, "🔍");
+  const buscarFila = h("div", { class: "chat-buscar" }, buscarChat, cuentaChat);
+
   root.append(
     h("header", { class: "topbar chat-top" },
       h("button", { class: "icon-btn", title: "Volver", onClick: () => navigate("/sessions") }, "‹"),
-      titleEl, stopBtn)
+      titleEl, btnBuscar, stopBtn)
   );
 
   const offline = h("div", { class: "banner", hidden: true }, "Sin conexión con el servidor · reintentando…");
@@ -54,6 +82,84 @@ export async function chatView(params, root, signal) {
   );
   const cuerpo = h("div", { class: "chat-body" }, scroller, irAbajo);
 
+  let coincidencias = [];
+  let idxCoincidencia = -1;
+
+  function limpiarMarcas() {
+    for (const el of scroller.querySelectorAll("mark.resaltado")) {
+      const padre = el.parentNode;
+      padre.replaceChild(document.createTextNode(el.textContent), el);
+      padre.normalize();
+    }
+    coincidencias = [];
+    idxCoincidencia = -1;
+    cuentaChat.hidden = true;
+  }
+
+  function aplicarBusquedaChat() {
+    limpiarMarcas();
+    const q = buscarChat.value.trim();
+    if (!q) return;
+    const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    // se buscan coincidencias en el texto de cada burbuja (nodos de texto)
+    for (const burbuja of scroller.querySelectorAll(".bubble")) {
+      const walker = document.createTreeWalker(burbuja, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) =>
+          n.nodeValue.trim() && !n.parentNode.closest(".code-head, .tools")
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT,
+      });
+      const nodos = [];
+      while (walker.nextNode()) nodos.push(walker.currentNode);
+      for (const nodo of nodos) {
+        const texto = nodo.nodeValue;
+        if (!re.test(texto)) continue;
+        re.lastIndex = 0;
+        const frag = document.createDocumentFragment();
+        let ultimo = 0;
+        let m;
+        while ((m = re.exec(texto))) {
+          frag.append(document.createTextNode(texto.slice(ultimo, m.index)));
+          const mark = document.createElement("mark");
+          mark.className = "resaltado";
+          mark.textContent = m[0];
+          frag.append(mark);
+          coincidencias.push(mark);
+          ultimo = m.index + m[0].length;
+        }
+        frag.append(document.createTextNode(texto.slice(ultimo)));
+        nodo.parentNode.replaceChild(frag, nodo);
+      }
+    }
+    cuentaChat.hidden = coincidencias.length === 0;
+    cuentaChat.textContent = coincidencias.length ? `0/${coincidencias.length}` : "";
+    if (coincidencias.length) irACoincidencia(0);
+  }
+
+  function irACoincidencia(i) {
+    if (!coincidencias.length) return;
+    idxCoincidencia = (i + coincidencias.length) % coincidencias.length;
+    coincidencias.forEach((el, n) => el.classList.toggle("activa", n === idxCoincidencia));
+    cuentaChat.textContent = `${idxCoincidencia + 1}/${coincidencias.length}`;
+    const el = coincidencias[idxCoincidencia];
+    // centrar la coincidencia en el scroller
+    const top = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    scroller.scrollTop += top - scroller.clientHeight / 2;
+  }
+
+  buscarChat.addEventListener("input", aplicarBusquedaChat);
+  buscarChat.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      irACoincidencia(idxCoincidencia + (e.shiftKey ? -1 : 1));
+    }
+    if (e.key === "Escape") {
+      buscarChat.value = "";
+      aplicarBusquedaChat();
+      buscarChat.hidden = true;
+    }
+  });
+
   /* Adjuntos pendientes de enviar (chips sobre el composer) */
   const adjuntos = [];
   const chipsAdjuntos = h("div", { class: "attach-chips", hidden: true });
@@ -83,7 +189,7 @@ export async function chatView(params, root, signal) {
     },
   });
 
-  root.append(offline, permBanner, controles.fila, cuerpo, typing);
+  root.append(offline, permBanner, controles.fila, buscarFila, cuerpo, typing);
 
   /* Botón "Copiar" de los bloques de código (delegado: el HTML de las burbujas
      se regenera con cada fragmento recibido por streaming). */
@@ -239,6 +345,7 @@ export async function chatView(params, root, signal) {
 
   /* ---------- historial ---------- */
   function renderHistory(msgs) {
+    limpiarMarcas();
     bubbles.clear();
     reasoningChips.clear();
     toolChips.clear();

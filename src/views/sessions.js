@@ -5,6 +5,7 @@ import { Client } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 
 const LAST_DIR_KEY = "ocmovil.lastDir";
+const ORDEN_KEY = "ocmovil.ordenSesiones";
 
 export async function sessionsView(_params, root, signal) {
   const permBadge = h("span", { class: "perm-badge", hidden: true }, "0");
@@ -24,6 +25,23 @@ export async function sessionsView(_params, root, signal) {
       h("button", { class: "icon-btn", title: "Ajustes", onClick: () => navigate("/settings") }, "⚙")
     )
   );
+
+  /* Barra de busqueda + orden. Con 50 sesiones la lista se vuelve inmanejable:
+     el filtro es en memoria (sin peticiones) y el orden se recuerda. */
+  const buscar = h("input", {
+    type: "search",
+    class: "buscar",
+    placeholder: "Buscar sesión…",
+    autocomplete: "off",
+    spellcheck: "false",
+  });
+  const ordenSel = h("select", { class: "orden", title: "Ordenar", "aria-label": "Ordenar sesiones" },
+    h("option", { value: "recientes" }, "Recientes"),
+    h("option", { value: "antiguas" }, "Antiguas"),
+    h("option", { value: "nombre" }, "Nombre")
+  );
+  const barra = h("div", { class: "lista-barra" }, buscar, ordenSel);
+  root.append(barra);
 
   const newPanel = h("div", { class: "new-panel", hidden: true });
   const dirInput = h("input", {
@@ -92,6 +110,7 @@ export async function sessionsView(_params, root, signal) {
      cada 15 s (parpadeo si el usuario estaba leyendo la lista). */
   let firmaLista = "";
   let nPermisos = -1;
+  let todas = []; // ultima lista recibida del servidor (el filtro es en memoria)
 
   function pintarBadge(n) {
     if (n === nPermisos) return;
@@ -100,16 +119,46 @@ export async function sessionsView(_params, root, signal) {
     permBadge.textContent = String(n);
   }
 
+  /* Aplica busqueda (nombre/id) + orden elegido. Sin peticiones: se hace sobre
+     la lista ya descargada. */
+  function filtrarYOrdenar(items) {
+    const q = buscar.value.trim().toLowerCase();
+    let lista = items;
+    if (q) {
+      lista = items.filter((s) =>
+        `${s.title || ""} ${s.id} ${s.model?.id || ""}`.toLowerCase().includes(q)
+      );
+    }
+    const orden = ordenSel.value;
+    const t = (s) => s.time?.updated || s.time?.created || 0;
+    const copia = [...lista];
+    if (orden === "antiguas") copia.sort((a, b) => t(a) - t(b));
+    else if (orden === "nombre")
+      copia.sort((a, b) => (a.title || a.id).localeCompare(b.title || b.id));
+    else copia.sort((a, b) => t(b) - t(a)); // recientes (por defecto)
+    return copia;
+  }
+
   function pintarLista(items) {
-    const filas = items.map((s) => ({
+    const visibles = filtrarYOrdenar(items);
+    const filas = visibles.map((s) => ({
       id: s.id,
       title: s.title || s.id,
       sub: `${timeAgo(s.time?.created || Date.now())}${s.model?.id ? ` · ${s.model.id}` : ""}`,
     }));
-    const firma = JSON.stringify(filas);
+    // la firma incluye el filtro para que un cambio de busqueda repinte
+    const firma = JSON.stringify([filas, buscar.value, ordenSel.value]);
     if (firma === firmaLista) return; // sin cambios: ni se toca el DOM
     firmaLista = firma;
     vacio.hidden = filas.length > 0;
+    if (!filas.length && buscar.value.trim()) {
+      // hay busqueda y no hay resultados: mensaje especifico
+      vacio.querySelector(".empty-title").textContent = "Sin resultados";
+      vacio.querySelector(".hint").textContent = "Prueba con otro texto o borra la búsqueda.";
+    } else {
+      vacio.querySelector(".empty-title").textContent = "Todavía no hay sesiones";
+      vacio.querySelector(".hint").textContent = "Pulsa + para crear la primera en la carpeta de tu proyecto.";
+    }
     const scroll = list.scrollTop;
     list.textContent = "";
     for (const f of filas) {
@@ -130,13 +179,30 @@ export async function sessionsView(_params, root, signal) {
     loading.hidden = true;
   }
 
+  // el filtro y el orden repintan al instante (sin esperar al intervalo)
+  buscar.addEventListener("input", () => pintarLista(todas));
+  ordenSel.addEventListener("change", () => {
+    try {
+      localStorage.setItem(ORDEN_KEY, ordenSel.value);
+    } catch {
+      /* best-effort */
+    }
+    pintarLista(todas);
+  });
+  try {
+    ordenSel.value = localStorage.getItem(ORDEN_KEY) || "recientes";
+  } catch {
+    /* por defecto recientes */
+  }
+
   async function refresh() {
     try {
       const [ses, perms] = await Promise.all([
         Client.sessions(50),
         Client.allPendingPermissions(), // best-effort: nunca rechaza
       ]);
-      pintarLista(ses?.data || []);
+      todas = ses?.data || [];
+      pintarLista(todas);
       pintarBadge(perms.length);
     } catch (err) {
       if (err.isAuth) {
