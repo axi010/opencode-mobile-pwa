@@ -46,12 +46,38 @@ export async function chatView(params, root, signal) {
       }
     },
   }, "🔍");
+
+  /* Copiar la conversacion completa en Markdown (para pegarla en un issue,
+     un informe o pasarla a otra IA). Se genera desde el DOM ya renderizado. */
+  const btnCopiarTodo = h("button", {
+    type: "button",
+    class: "icon-btn",
+    title: "Copiar toda la conversación",
+    "aria-label": "Copiar toda la conversación",
+    onClick: async () => {
+      const partes = [];
+      for (const el of scroller.children) {
+        if (el.classList.contains("bubble") && el.classList.contains("user")) {
+          partes.push(`## Usuario\n\n${el.textContent.trim()}\n`);
+        } else if (el.classList.contains("bubble") && el.classList.contains("assistant")) {
+          const body = el.querySelector(".md");
+          partes.push(`## Asistente\n\n${body ? body.innerText.trim() : ""}\n`);
+        } else if (el.classList.contains("note")) {
+          partes.push(`> ${el.textContent.trim()}\n`);
+        }
+      }
+      if (!partes.length) return toast("No hay nada que copiar");
+      const texto = `# Conversación — ${titleEl.textContent}\n\n${partes.join("\n")}`;
+      const ok = await copiarTexto(texto);
+      toast(ok ? "Conversación copiada en Markdown" : "No se pudo copiar");
+    },
+  }, "⧉");
   const buscarFila = h("div", { class: "chat-buscar" }, buscarChat, cuentaChat);
 
   root.append(
     h("header", { class: "topbar chat-top" },
       h("button", { class: "icon-btn", title: "Volver", onClick: () => navigate("/sessions") }, "‹"),
-      titleEl, btnBuscar, stopBtn)
+      titleEl, btnBuscar, btnCopiarTodo, stopBtn)
   );
 
   const offline = h("div", { class: "banner", hidden: true }, "Sin conexión con el servidor · reintentando…");
