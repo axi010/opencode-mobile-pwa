@@ -376,6 +376,14 @@ export async function settingsView(_params, root, _signal) {
       logPre)
   );
 
+  /* ================= SISTEMA ================= */
+  main.append(
+    h("section", { class: "sec" }, h("h3", {}, t("Sistema")),
+      h("p", { class: "hint" }, t("Estado de los servicios del servidor: MCP, proveedores, plugins, skills y comandos.")),
+      h("div", { class: "btn-row" },
+        h("button", { class: "ghost", onClick: () => navigate("/system") }, t("Ver sistema"))))
+  );
+
   /* ================= ACERCA DE ================= */
   main.append(
     h("section", { class: "sec" }, h("h3", {}, t("Acerca de")),

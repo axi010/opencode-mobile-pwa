@@ -155,6 +155,23 @@ export const Client = {
   fsList: (path) => api("GET", `/api/fs/list?path=${encodeURIComponent(path)}`),
   fsFind: (query) => api("GET", `/api/fs/find?query=${encodeURIComponent(query)}`),
 
+  /* ---- sistema: MCP, plugins, skills, comandos y proveedores ----
+     Contrato verificado contra el servidor v2.1.4:
+       GET  /api/mcp       -> { data: [{name, status:{status}, integrationID?}] }
+       POST /api/experimental/mcp/{server}/connect    (y /disconnect)
+       GET  /api/plugin    -> [{id, source:{type}, features, state:{status}}]
+       GET  /api/skill     -> [{id, name, description}]
+       GET  /api/command   -> [{name, description}]
+       GET  /api/provider  -> [{id, name, env}]
+     OJO: NO existe endpoint de LSP en la API HTTP (es interno del servidor). */
+  mcp: () => api("GET", "/api/mcp"),
+  mcpConnect: (nombre) => api("POST", `/api/experimental/mcp/${encodeURIComponent(nombre)}/connect`),
+  mcpDisconnect: (nombre) => api("POST", `/api/experimental/mcp/${encodeURIComponent(nombre)}/disconnect`),
+  plugins: () => api("GET", "/api/plugin"),
+  skills: () => api("GET", "/api/skill"),
+  commands: () => api("GET", "/api/command"),
+  providers: () => api("GET", "/api/provider"),
+
   /* Permisos (OpenAPI v2): pendientes globales + respuesta del movil.
      decision: "once" (permitir esta vez) | "always" (guardar regla) | "reject"
      NOTA: /api/permission/request filtra por location activa del servidor;

@@ -13,12 +13,14 @@ import { sessionsView } from "./views/sessions.js";
 import { chatView } from "./views/chat.js";
 import { permissionsView } from "./views/permissions.js";
 import { settingsView } from "./views/settings.js";
+import { systemView } from "./views/system.js";
 
 route("/setup", setupView);
 route("/sessions", sessionsView);
 route("/chat/:id", chatView);
 route("/permissions", permissionsView);
 route("/settings", settingsView);
+route("/system", systemView);
 
 // Si la URL trae params de acceso (QR: ?server/?pair/?token, en query o en
 // hash), fuerza la pantalla de setup aunque ya hubiera credenciales.

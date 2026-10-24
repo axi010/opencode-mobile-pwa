@@ -239,6 +239,38 @@ const EN = {
   "Avisos solo en segundo plano y con permiso concedido. Android mantiene la app viva unos 30 s tras ocultarla; pasada esa ventana no puede avisar (sin servidor push).":
     "Alerts only in the background and with permission granted. Android keeps the app alive ~30 s after hiding it; past that window it cannot alert (no push server).",
 
+  /* ---- vista Sistema ---- */
+  "Sistema": "System",
+  "Servidores MCP": "MCP servers",
+  "Proveedores de modelos": "Model providers",
+  "Plugins": "Plugins",
+  "Skills": "Skills",
+  "Comandos": "Commands",
+  "Servidores de lenguaje (LSP)": "Language servers (LSP)",
+  "La API HTTP de opencode no expone el estado de los LSP: los gestiona el servidor internamente (según los ficheros de tu proyecto). Aquí no hay nada que configurar.":
+    "The opencode HTTP API does not expose LSP status: the server manages them internally (based on your project files). There is nothing to configure here.",
+  "Estado de los servicios del servidor: MCP, proveedores, plugins, skills y comandos.":
+    "Status of the server services: MCP, providers, plugins, skills and commands.",
+  "Ver sistema": "View system",
+  "activo": "active",
+  "inactivo": "inactive",
+  "Conectar": "Connect",
+  "Desconectar": "Disconnect",
+  "Conectado": "Connected",
+  "Desconectado": "Disconnected",
+  "No se pudo cambiar el estado": "Could not change the state",
+  "No hay servidores MCP configurados.": "No MCP servers configured.",
+  "Sin proveedores.": "No providers.",
+  "Sin plugins.": "No plugins.",
+  "Sin skills.": "No skills.",
+  "Sin comandos.": "No commands.",
+  "Error cargando MCP": "Error loading MCP",
+  "Error cargando proveedores": "Error loading providers",
+  "Error cargando plugins": "Error loading plugins",
+  "Error cargando skills": "Error loading skills",
+  "Error cargando comandos": "Error loading commands",
+  "origen: {tipo}": "source: {tipo}",
+
   /* ---- ajustes: diagnostico / acerca de ---- */
   "Errores locales ({n})": "Local errors ({n})",
   "Sin errores registrados.": "No errors logged.",
