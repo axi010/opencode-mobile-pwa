@@ -23,3 +23,7 @@ desktop.ini
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Utilidades locales de capturas (no forman parte de la app)
+public/__demo-mock.js
+

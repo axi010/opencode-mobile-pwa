@@ -32,15 +32,14 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
 - **No frameworks**: vanilla JS + a ~20-line DOM helper. ~45 kB gzipped.
 
-<!--
 ## 📱 Screenshots
 
-Add your own images to a `screenshots/` folder and uncomment this block:
-
-| Sessions | Chat | Settings |
+| Sessions | Chat | Permissions |
 | --- | --- | --- |
-| ![Sessions](screenshots/sessions.png) | ![Chat](screenshots/chat.png) | ![Settings](screenshots/settings.png) |
--->
+| ![Sessions](screenshots/sessions.png) | ![Chat](screenshots/chat.png) | ![Permissions](screenshots/permissions.png) |
+
+> Screenshots show **fictional demo data**. The app itself stores nothing but your
+> own credential on your device.
 
 
 ## 🔧 Requirements
