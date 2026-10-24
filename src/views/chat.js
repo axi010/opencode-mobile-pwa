@@ -492,22 +492,40 @@ export async function chatView(params, root, signal) {
   const ac = new AbortController();
   signal.addEventListener("abort", () => ac.abort());
 
-  // Suscripcion SSE unica con reintento automatico (backoff fijo 3s).
+  /* Suscripcion SSE con RECONEXION y BACKOFF EXPONENCIAL.
+     Antes reintentaba cada 3 s fijos: si el servidor estaba caido, machacaba la
+     red y gastaba bateria. Ahora: 1s, 2s, 4s, 8s... hasta 30s, con algo de
+     aleatoriedad (jitter) para no coincidir con otros clientes. Al conectar
+     bien, el contador se reinicia. */
+  let intentos = 0;
+  let timerReconexion = null;
+
   function connect() {
     subscribeEvents({
       onEvent: (ev) => {
+        if (offline.hidden === false) {
+          // se ha recuperado la conexion tras un corte
+          toast("Conexión restablecida");
+        }
         offline.hidden = true;
+        intentos = 0; // exito: se reinicia el backoff
         handleEvent(ev);
       },
       onError: () => {
         if (ac.signal.aborted) return;
         offline.hidden = false;
-        setTimeout(connect, 3000);
+        const base = Math.min(1000 * 2 ** intentos, 30000);
+        const espera = Math.round(base * (0.7 + Math.random() * 0.6)); // jitter
+        intentos++;
+        offline.textContent = `Sin conexión con el servidor · reintentando en ${Math.round(espera / 1000)} s…`;
+        clearTimeout(timerReconexion);
+        timerReconexion = setTimeout(connect, espera);
       },
       signal: ac.signal,
     });
   }
   connect();
+  signal.addEventListener("abort", () => clearTimeout(timerReconexion));
 
   /* ---------- envio ---------- */
   async function send() {
