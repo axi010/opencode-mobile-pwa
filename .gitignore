@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+
+# Salida de build
+dist/
+
+# Logs y temporales
+*.log
+*.tmp
+*.bak
+
+# Basura del sistema
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Seguridad: NUNCA subir credenciales locales
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/

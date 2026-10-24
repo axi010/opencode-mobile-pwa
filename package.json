@@ -1,0 +1,19 @@
+{
+  "name": "opencode-mobile",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Mobile PWA client for your opencode server: streaming chat, permissions, model picker and file attach",
+  "license": "MIT",
+  "author": "Axier Castro Vega",
+  "keywords": ["opencode", "pwa", "mobile", "client", "sse"],
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "devDependencies": {
+    "qrcode": "^1.5.4",
+    "vite": "^7.1.0"
+  }
+}

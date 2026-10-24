@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#0d1117" />
+    <!-- Nunca enviar el Referer: la URL puede llevar params de acceso del QR. -->
+    <meta name="referrer" content="no-referrer" />
+    <meta name="description" content="Cliente movil para opencode: chatea con tus sesiones desde el telefono." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="./icon-192.png" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>OpenCode Móvil</title>
+  </head>
+  <body>
+    <div id="app" aria-live="polite"></div>
+    <div id="toast" hidden></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

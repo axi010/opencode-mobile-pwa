@@ -1,0 +1,430 @@
+/* Chat con streaming en tiempo real.
+   Flujo de eventos SSE (filtrados por sessionID):
+     session.text.started/delta/ended      -> burbujas de texto en vivo
+     session.reasoning.*                   -> chip colapsable "pensando…"
+     session.tool.input.started|success|error -> chip de herramienta
+     session.step.started|ended            -> indicador "escribiendo…"
+   Cualquier evento no mapeado provoca un reconciliado diferido (self-healing). */
+import { h, renderMarkdown, timeAgo, toast, copiarTexto } from "../ui/dom.js";
+import { Client, subscribeEvents } from "../api/client.js";
+import { navigate } from "../ui/router.js";
+import { crearControles } from "../ui/chat-controls.js";
+
+export async function chatView(params, root, signal) {
+  const sessionID = params.id;
+
+  const titleEl = h("h1", {}, "Chat");
+  const stopBtn = h(
+    "button",
+    { class: "icon-btn", hidden: true, title: "Detener", onClick: () =>
+        Client.interrupt(sessionID).catch((e) => toast(e.message)) },
+    "■"
+  );
+  root.append(
+    h("header", { class: "topbar chat-top" },
+      h("button", { class: "icon-btn", title: "Volver", onClick: () => navigate("/sessions") }, "‹"),
+      titleEl, stopBtn)
+  );
+
+  const offline = h("div", { class: "banner", hidden: true }, "Sin conexión con el servidor · reintentando…");
+  const permBanner = h("div", { class: "perm-banner", hidden: true });
+  const scroller = h("div", { class: "chat-scroll" });
+  const typing = h(
+    "div",
+    { class: "typing", hidden: true },
+    h("span", { class: "dots", "aria-hidden": "true" }, h("i"), h("i"), h("i")),
+    "escribiendo…"
+  );
+
+  /* Botón flotante para volver al final cuando se ha subido en la conversación */
+  const irAbajo = h(
+    "button",
+    {
+      type: "button",
+      class: "to-bottom",
+      hidden: true,
+      title: "Ir al final",
+      "aria-label": "Ir al final",
+      onClick: () => {
+        const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        scroller.scrollTo({ top: scroller.scrollHeight, behavior: reducir ? "auto" : "smooth" });
+      },
+    },
+    "↓"
+  );
+  const cuerpo = h("div", { class: "chat-body" }, scroller, irAbajo);
+
+  /* Adjuntos pendientes de enviar (chips sobre el composer) */
+  const adjuntos = [];
+  const chipsAdjuntos = h("div", { class: "attach-chips", hidden: true });
+  function pintarAdjuntos() {
+    chipsAdjuntos.textContent = "";
+    chipsAdjuntos.hidden = adjuntos.length === 0;
+    adjuntos.forEach((a, i) => {
+      chipsAdjuntos.append(
+        h("span", { class: "attach-chip" },
+          h("span", { class: "attach-name", title: a.uri }, a.name),
+          h("button", {
+            type: "button", class: "attach-x", title: "Quitar",
+            onClick: () => { adjuntos.splice(i, 1); pintarAdjuntos(); },
+          }, "✕"))
+      );
+    });
+  }
+
+  const controles = crearControles({
+    sessionID,
+    onArchivos: (files) => {
+      for (const f of files) {
+        if (!adjuntos.some((a) => a.uri === f.uri)) adjuntos.push(f);
+      }
+      pintarAdjuntos();
+      toast(`${files.length} archivo(s) adjuntado(s)`);
+    },
+  });
+
+  root.append(offline, permBanner, controles.fila, cuerpo, typing);
+
+  /* Botón "Copiar" de los bloques de código (delegado: el HTML de las burbujas
+     se regenera con cada fragmento recibido por streaming). */
+  scroller.addEventListener("click", async (e) => {
+    const btn = e.target.closest?.(".copy-btn");
+    if (!btn) return;
+    const pre = btn.closest(".code-block")?.querySelector("pre");
+    if (!pre) return;
+    const ok = await copiarTexto(pre.textContent);
+    btn.textContent = ok ? "Copiado" : "No se pudo";
+    setTimeout(() => {
+      btn.textContent = "Copiar";
+    }, 1500);
+  });
+
+  const input = h("textarea", { rows: 1, placeholder: "Mensaje…", enterkeyhint: "send" });
+  const sendBtn = h("button", {}, "Enviar");
+  root.append(chipsAdjuntos, h("div", { class: "composer" }, input, sendBtn));
+
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+  });
+
+  /* ---------- estado ---------- */
+  const bubbles = new Map(); // "msgID:ordinal" -> {el, body, raw}
+  const reasoningChips = new Map(); // "msgID:ordinal" -> {details, pre, raw}
+  const toolChips = new Map(); // toolId -> chip
+  let running = 0;
+  let reconcileTimer = null;
+
+  const nearBottom = () => scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 160;
+  const actualizarIrAbajo = () => {
+    irAbajo.hidden = nearBottom();
+  };
+  const scrollDown = (force) => {
+    if (force || nearBottom()) scroller.scrollTop = scroller.scrollHeight;
+    actualizarIrAbajo();
+  };
+  scroller.addEventListener("scroll", actualizarIrAbajo, { passive: true });
+
+  function updateBusy() {
+    typing.hidden = running <= 0;
+    stopBtn.hidden = running <= 0;
+    scrollDown();
+  }
+
+  function addNote(text) {
+    scroller.append(h("div", { class: "note" }, text));
+    scrollDown(true);
+  }
+
+  function quitarVacio() {
+    scroller.querySelector(".empty-chat")?.remove();
+  }
+
+  function addUserBubble(text) {
+    quitarVacio();
+    scroller.append(h("div", { class: "bubble user" }, text));
+    scrollDown(true);
+  }
+
+  function ensureBubble(key) {
+    let b = bubbles.get(key);
+    if (!b) {
+      quitarVacio();
+      const el = h("div", { class: "bubble assistant" });
+      const body = h("div", { class: "md" });
+      const tools = h("div", { class: "tools" });
+      el.append(body, tools);
+      scroller.append(el);
+      b = { el, body, tools, raw: "" };
+      bubbles.set(key, b);
+    }
+    return b;
+  }
+
+  function streamDelta(key, delta, full) {
+    const b = ensureBubble(key);
+    b.raw = full !== undefined ? full : b.raw + (delta || "");
+    b.body.innerHTML = renderMarkdown(b.raw);
+    scrollDown();
+  }
+
+  function ensureReasoning(key) {
+    let r = reasoningChips.get(key);
+    if (!r) {
+      const pre = h("pre", {});
+      const details = h("details", { class: "reasoning" },
+        h("summary", {}, "pensando…"), pre);
+      const b = ensureBubble(key);
+      b.el.insertBefore(details, b.body);
+      r = { details, pre, raw: "" };
+      reasoningChips.set(key, r);
+    }
+    return r;
+  }
+
+  function toolChip(toolId, name) {
+    let chip = toolChips.get(toolId);
+    if (!chip) {
+      chip = h("span", { class: "tool running" }, `⚙ ${name || "tool"}…`);
+      // el chip se asienta en la ultima burbuja asistente conocida
+      const last = [...bubbles.values()].pop();
+      (last?.tools || scroller).append(chip);
+      toolChips.set(toolId, chip);
+    }
+    return chip;
+  }
+
+  /* ---------- permisos en vivo (contrato OpenAPI: once|always|reject) ---------- */
+  async function refreshPermissions() {
+    try {
+      const r = await Client.sessionPermissions(sessionID);
+      const items = r?.data || [];
+      permBanner.textContent = "";
+      for (const p of items) {
+        permBanner.append(
+          h(
+            "div",
+            { class: "perm-row" },
+            h(
+              "span",
+              { class: "perm-text" },
+              h("b", {}, (p.action || "permiso") + ": "),
+              (p.resources || []).join("  ·  ")
+            ),
+            h(
+              "div",
+              { class: "perm-actions" },
+              h("button", { class: "perm-ok", onClick: () => respond(p, "once") }, "Permitir"),
+              h("button", { class: "perm-always", onClick: () => respond(p, "always") }, "Siempre"),
+              h("button", { class: "perm-ko", onClick: () => respond(p, "reject") }, "Rechazar")
+            )
+          )
+        );
+      }
+      permBanner.hidden = items.length === 0;
+    } catch {
+      /* el banner es best-effort: lo refresca el siguiente evento */
+    }
+  }
+
+  async function respond(p, decision) {
+    try {
+      await Client.replyPermission(p.sessionID, p.id, decision);
+      toast(decision === "reject" ? "Permiso rechazado" : decision === "always" ? "Permitido (siempre)" : "Permitido");
+      await refreshPermissions();
+    } catch (err) {
+      toast(err.message || "No se pudo responder");
+    }
+  }
+
+  /* ---------- historial ---------- */
+  function renderHistory(msgs) {
+    bubbles.clear();
+    reasoningChips.clear();
+    toolChips.clear();
+    scroller.textContent = "";
+    const ordered = [...msgs].sort((a, b) => (a.time?.created || 0) - (b.time?.created || 0));
+    for (const m of ordered) {
+      if (m.type === "user") addUserBubble(m.text || "");
+      else if (m.type === "assistant") {
+        const text = (m.content || []).filter((c) => c.type === "text").map((c) => c.text).join("");
+        if (text) streamDelta(`${m.id}:0`, "", text);
+      } else if (m.type === "model-switched") addNote(`modelo → ${m.model?.id || "?"}`);
+      else if (m.type === "agent-switched") addNote(`agente → ${m.agent || "?"}`);
+      // "idle"/"shell" u otros tipos de sistema: ruido, no se muestran
+    }
+    if (!scroller.children.length) {
+      scroller.append(
+        h("p", { class: "empty-chat hint" }, "Aún no hay mensajes. Escribe abajo para empezar.")
+      );
+    }
+    scrollDown(true);
+  }
+
+  async function loadMessages() {
+    const r = await Client.messages(sessionID);
+    renderHistory(r?.data || []);
+  }
+
+  /* ---------- eventos en vivo ---------- */
+  function scheduleReconcile() {
+    if (reconcileTimer || running > 0) return;
+    reconcileTimer = setTimeout(async () => {
+      reconcileTimer = null;
+      if (running > 0) return;
+      try {
+        await loadMessages();
+      } catch {
+        /* reconciliable en el siguiente evento */
+      }
+    }, 1200);
+  }
+
+  function handleEvent(ev) {
+    if (!ev?.type || ev.type === "server.connected") return;
+    const d = ev.data || {};
+    if (d.sessionID && d.sessionID !== sessionID) return; // el stream es global
+
+    // Permiso de ESTA sesión (o global): actualizar el banner de decision.
+    if (ev.type.includes("permission")) {
+      refreshPermissions();
+      return;
+    }
+
+    switch (ev.type) {
+      case "session.text.started":
+        // el indicador de ocupado lo gestiona session.step.started (evita doble incremento)
+        ensureBubble(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
+        break;
+      case "session.text.delta":
+        streamDelta(`${d.assistantMessageID}:${d.ordinal ?? 0}`, d.delta);
+        break;
+      case "session.text.ended":
+        streamDelta(`${d.assistantMessageID}:${d.ordinal ?? 0}`, "", d.text);
+        break;
+      case "session.reasoning.started":
+        ensureReasoning(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
+        break;
+      case "session.reasoning.delta": {
+        const r = ensureReasoning(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
+        r.raw += d.delta || "";
+        r.pre.textContent = r.raw;
+        r.details.querySelector("summary").textContent = "pensando…";
+        break;
+      }
+      case "session.reasoning.ended": {
+        const r = ensureReasoning(`${d.assistantMessageID}:${d.ordinal ?? 0}`);
+        r.raw = d.text || r.raw;
+        r.pre.textContent = r.raw;
+        r.details.querySelector("summary").textContent = "pensado";
+        break;
+      }
+      case "session.tool.input.started":
+        toolChip(d.id, d.name);
+        break;
+      case "session.tool.success": {
+        const chip = toolChip(d.id);
+        chip.className = "tool ok";
+        chip.textContent = chip.textContent.replace(/…$/, "") + " ✓";
+        break;
+      }
+      case "session.tool.error": {
+        const chip = toolChip(d.id);
+        chip.className = "tool err";
+        chip.textContent = chip.textContent.replace(/…$/, "") + " ✗";
+        break;
+      }
+      case "session.tool.called":
+      case "session.tool.progress":
+      case "session.tool.input.ended":
+        break;
+      case "session.step.started":
+        running++;
+        updateBusy();
+        break;
+      case "session.step.ended":
+        running = Math.max(0, running - 1);
+        updateBusy();
+        if (d.finish !== "tool-calls") scheduleReconcile();
+        break;
+      default:
+        if (/\.idle$/.test(ev.type)) {
+          running = 0;
+          updateBusy();
+          scheduleReconcile();
+        } else if (ev.type.startsWith("session.")) {
+          scheduleReconcile();
+        }
+    }
+  }
+
+  /* ---------- arranque ---------- */
+  try {
+    const detail = await Client.getSession(sessionID);
+    if (detail?.data?.title) titleEl.textContent = detail.data.title;
+  } catch {
+    /* el título es opcional */
+  }
+  // estado real del modo (plan/build) y del modelo en la fila de controles
+  controles.sincronizar();
+
+  try {
+    await loadMessages();
+  } catch (err) {
+    if (err.isAuth) {
+      toast("Credencial caducada: vuelve a emparejar");
+      navigate("/setup");
+      return;
+    }
+    addNote(`Error cargando mensajes: ${err.message}`);
+  }
+
+  // permisos que ya estaban pendientes al abrir el chat
+  refreshPermissions();
+
+  const ac = new AbortController();
+  signal.addEventListener("abort", () => ac.abort());
+
+  // Suscripcion SSE unica con reintento automatico (backoff fijo 3s).
+  function connect() {
+    subscribeEvents({
+      onEvent: (ev) => {
+        offline.hidden = true;
+        handleEvent(ev);
+      },
+      onError: () => {
+        if (ac.signal.aborted) return;
+        offline.hidden = false;
+        setTimeout(connect, 3000);
+      },
+      signal: ac.signal,
+    });
+  }
+  connect();
+
+  /* ---------- envio ---------- */
+  async function send() {
+    const text = input.value.trim();
+    const files = adjuntos.map((a) => ({ uri: a.uri, name: a.name }));
+    if (!text && !files.length) return;
+    input.value = "";
+    input.style.height = "auto";
+    const etiqueta = files.length ? `${text}${text ? " " : ""}📎 ${files.map((f) => f.name).join(", ")}` : text;
+    addUserBubble(etiqueta);
+    adjuntos.length = 0;
+    pintarAdjuntos();
+    try {
+      await Client.prompt(sessionID, text, files);
+    } catch (err) {
+      toast(`No se pudo enviar: ${err.message}`);
+      if (err.isAuth) navigate("/setup");
+    }
+  }
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+}
