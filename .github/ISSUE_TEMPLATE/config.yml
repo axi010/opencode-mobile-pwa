@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability (private)
+    url: https://github.com/axi010/opencode-mobile-pwa/security/advisories/new
+    about: Please do NOT open a public issue for security problems. Use the private advisory form.
+  - name: 💬 Questions and ideas
+    url: https://github.com/axi010/opencode-mobile-pwa/discussions
+    about: For open-ended questions or to share how you use the app.

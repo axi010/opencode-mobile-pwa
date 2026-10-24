@@ -1,0 +1,41 @@
+name: ✨ Feature request
+description: Suggest an idea or improvement
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Please keep in mind this project is
+        **framework-free on purpose** (vanilla JS + strict CSP).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does it solve?
+      description: Describe the need, not only the solution.
+      placeholder: When I use the app on my phone I can't ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: Add a button that ...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints check
+      description: This project has two hard design rules.
+      options:
+        - label: It can be done **without adding a UI framework** (React/Vue/Svelte/Tailwind)
+          required: true
+        - label: It can be done **without inline scripts or inline styles** (strict CSP)
+          required: true

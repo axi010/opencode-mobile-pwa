@@ -1,0 +1,62 @@
+name: 🐛 Bug report
+description: Something is broken or behaves unexpectedly
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+        **Security problems: do NOT open a public issue — see SECURITY.md.**
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected instead.
+      placeholder: When I open the chat, ... but I expected ...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Connect with the QR
+        2. Open a session
+        3. Tap ...
+    validations:
+      required: true
+  - type: input
+    id: opencode
+    attributes:
+      label: opencode version
+      description: Shown in Settings → "Probar conexión" (e.g. v2.1.4)
+      placeholder: v2.1.4
+    validations:
+      required: true
+  - type: dropdown
+    id: serve
+    attributes:
+      label: How are you serving the app?
+      options:
+        - npm run dev (localhost:5173)
+        - npm run preview (localhost:4173)
+        - HTTPS tunnel (scripts/movil.ps1 / movil.sh)
+        - Other static server
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / device
+      placeholder: Chrome on Android 15 / Safari on iOS 18
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console errors / local error log
+      description: Browser console output, or Settings → Diagnóstico → "Errores locales".
+      render: text
+    validations:
+      required: false
