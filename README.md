@@ -11,6 +11,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
+[![No dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](#-features)
+[![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen.svg)](#-tests)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
@@ -86,6 +88,9 @@ npm run dev            # http://localhost:5173
 # Production build + serve (with the /api proxy the app needs):
 npm run build
 npm run preview        # http://localhost:4173
+
+# Unit tests (no dependencies, uses Node's built-in runner):
+npm test
 ```
 
 Then open the app and connect:
@@ -132,7 +137,10 @@ opencode-mobile/
 ├── scripts/
 │   ├── qr-pairing.mjs      # generate the access QR (cross-platform)
 │   ├── movil.ps1 / movil.sh # one-shot: preview + cloudflare tunnel + QR
+│   ├── recortar-captura.ps1 # crop screenshots to phone size
 │   └── generar_iconos.ps1
+├── test/
+│   └── unit.test.js        # unit tests (Node's built-in runner)
 └── src/
     ├── main.js             # bootstrap, routes, theme, lock
     ├── api/client.js       # HTTP + SSE client
@@ -144,9 +152,20 @@ opencode-mobile/
     └── views/              # setup, sessions, chat, permissions, settings
 ```
 
+## 🧪 Tests
+
+Unit tests cover the logic without a DOM: **markdown rendering** (safe escaping,
+code blocks, lists), `timeAgo`, and the **path utilities** of the file browser
+(which must work against an opencode server on Windows, macOS and Linux). They
+use **Node's built-in test runner**, so they add **no dependencies**:
+
+```bash
+npm test
+```
+
 ## 🤝 Contributing
 
-**Everyone is welcome!** This is a small, framework-free project — easy to read and easy to hack on.
+**Everyone is welcome!**This is a small, framework-free project — easy to read and easy to hack on.
 
 - 🟢 **New here?** Check the pinned issues
   [**👋 Ideas para colaborar**](https://github.com/axi010/opencode-mobile-pwa/issues/1)
@@ -224,6 +243,7 @@ npm install
 npm run dev            # desarrollo, accesible desde tu LAN (http://localhost:5173)
 npm run build          # build de producción
 npm run preview        # sirve el build con el proxy /api (http://localhost:4173)
+npm test               # tests unitarios (runner nativo de Node, sin dependencias)
 ```
 
 Luego genera el QR y escanéalo desde el móvil:
@@ -256,6 +276,17 @@ La API de opencode solo permite CORS desde loopback, así que la PWA habla con `
 - Un **QR contiene un token de 30 días** (equivalente a la contraseña). Trátalo como un secreto.
 - La app guarda la credencial en el `localStorage` del móvil.
 - El **PIN** es local al dispositivo (PBKDF2-SHA256, 150k iteraciones, espera creciente por fallo).
+
+## 🧪 Tests
+
+Cubren la lógica sin DOM: el **render de markdown** (escape seguro, bloques de
+código, listas), `timeAgo` y las **utilidades de rutas** del explorador (deben
+funcionar con el servidor opencode en Windows, macOS y Linux). Usan el **runner
+nativo de Node**: **no añaden dependencias**.
+
+```bash
+npm test
+```
 
 ## 🤝 Cómo colaborar
 
