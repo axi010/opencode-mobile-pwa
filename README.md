@@ -11,8 +11,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
-[![No dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](#-features)
-[![Tests](https://img.shields.io/badge/tests-15%20passing-brightgreen.svg)](#-tests)
+[![App dependencies](https://img.shields.io/badge/app%20dependencies-0-brightgreen.svg)](#-features)
+[![Tests](https://img.shields.io/badge/tests-27%20passing-brightgreen.svg)](#-tests)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
@@ -210,14 +210,20 @@ opencode-mobile/
 
 ## 🧪 Tests
 
-Unit tests cover the logic without a DOM: **markdown rendering** (safe escaping,
-code blocks, lists), `timeAgo`, and the **path utilities** of the file browser
-(which must work against an opencode server on Windows, macOS and Linux). They
-use **Node's built-in test runner**, so they add **no dependencies**:
+**27 unit tests** cover the logic without a DOM: **markdown rendering** (safe
+escaping, code blocks, lists), `timeAgo`, the **path utilities** of the file
+browser (which must work against an opencode server on Windows, macOS and Linux),
+and the **session filter** (project / text / sort). They use **Node's built-in
+test runner**, so they add **no dependencies**:
 
 ```bash
 npm test
 ```
+
+> **About "zero dependencies"**: the **app itself** ships no runtime dependency —
+> it's vanilla JS you can read in one sitting. The only entry in `package.json`
+> is `web-push`, and it's used **exclusively by the optional push service**
+> (`server/push-server.mjs`), which runs on your PC, not in the browser.
 
 ## 🤝 Contributing
 
@@ -376,14 +382,20 @@ La API de opencode solo permite CORS desde loopback, así que la PWA habla con `
 
 ## 🧪 Tests
 
-Cubren la lógica sin DOM: el **render de markdown** (escape seguro, bloques de
-código, listas), `timeAgo` y las **utilidades de rutas** del explorador (deben
-funcionar con el servidor opencode en Windows, macOS y Linux). Usan el **runner
-nativo de Node**: **no añaden dependencias**.
+**27 pruebas** cubren la lógica sin DOM: el **render de markdown** (escape seguro,
+bloques de código, listas), `timeAgo`, las **utilidades de rutas** del explorador
+(deben funcionar con el servidor opencode en Windows, macOS y Linux) y el
+**filtro de sesiones** (proyecto / texto / orden). Usan el **runner nativo de
+Node**: **no añaden dependencias**.
 
 ```bash
 npm test
 ```
+
+> **Sobre lo de "sin dependencias"**: la **app** no tiene ninguna dependencia de
+> ejecución — es JS vanilla que se lee de una sentada. La única entrada en
+> `package.json` es `web-push`, y la usa **exclusivamente el servicio de push
+> opcional** (`server/push-server.mjs`), que corre en tu PC, no en el navegador.
 
 ## 🤝 Cómo colaborar
 
