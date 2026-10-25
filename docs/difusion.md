@@ -55,6 +55,64 @@ Unofficial, community-made, not affiliated with the OpenCode team.
 Feedback and PRs very welcome — there are "good first issue" tasks ready 🙌
 ```
 
+## 🎯 COMUNIDADES DONDE POSTEARLO (verificadas)
+
+> Datos comprobados con búsquedas reales. **Los números cambian**: mira las normas
+> del sub antes de publicar (enlace *About → Rules*), porque las de abajo pueden
+> haber cambiado.
+
+| # | Comunidad | Tamaño | Encaje | Notas |
+| --- | --- | --- | --- | --- |
+| 🥇 | **Discord oficial de opencode** — `discord.gg/opencode` | 84.700 miembros, ~10.700 online | **El mejor** | Chat en vivo: el GIF se ve solo al pegar la URL. Busca el canal de *showcase*. Es donde está la gente que **ya usa** opencode. |
+| 🥈 | **r/opencode** | ~116.000 | **Muy bueno** | El sub del propio opencode. Publica aquí el de galería. |
+| 🥉 | **r/opencodeCLI** | ~100.000 | **Muy bueno** | Normas: *(1)* el post tiene que ir de opencode/vibe coding, *(2)* nada de posts de bajo esfuerzo. **Ojo: las fuentes se contradicen sobre autopromoción** → lee las normas antes. |
+| 4 | **r/SideProject** | ~478.000 | Bueno | El sub de "he hecho esto". Muy acogedor con proyectos. |
+| 5 | **r/coolgithubprojects** | — | Bueno | Específico para repos de GitHub. |
+| 6 | **r/opensource** | grande | Bueno | Proyectos open source con contexto. |
+| 7 | **r/IMadeThis** | ~50.000 | Aceptable | Showcase de creaciones. |
+| 8 | **r/selfhosted** | ~650.000 | Aceptable | Encaja porque **tú** alojas el servidor (y el servicio push). Ojo: aquí exigen que sea self-hosted de verdad. |
+
+**No recomiendo** `r/programming` (5M): tiene un listón altísimo y un post de
+proyecto personal suele caer. Ahí se conoce a la gente comentando, no publicando.
+
+### Orden recomendado (NO publiques todo el mismo día)
+
+1. **Discord de opencode** primero. Es el público exacto, el GIF se ve solo y las
+   respuestas son inmediatas → te dice qué preguntan.
+2. **Espera 1-2 días** y mejora el README con lo que te hayan preguntado.
+3. **r/opencode** y **r/opencodeCLI** (los dos del tema).
+4. **r/SideProject** y **r/coolgithubprojects** (público más general).
+5. El resto.
+
+> Si publicas en 6 sitios el mismo día con el mismo texto, Reddit lo detecta como
+> spam y te puede banear la cuenta. Ve **uno cada vez** y adapta el título.
+
+### ⚠️ LA PREGUNTA QUE TE VAN A HACER (ten la respuesta lista)
+
+opencode tiene una **interfaz web oficial** (`opencode web`). Alguien te lo va a
+mencionar **seguro**, así que respóndelo tú antes de que te lo pregunten. Respuesta
+honesta y lista para pegar:
+
+```
+Fair question — opencode web is the official web UI, and it's the same desktop
+experience in a browser. What I built is different in what I needed: a phone app.
+
+• It's an installable PWA (home screen icon, no browser chrome), not a web page
+• I can approve/reject permissions from the phone — that was my main annoyance
+• Model + variant picker with search, and attach files from my PC to a prompt
+• PIN lock, light/dark theme, and notifications that reach me with the app closed
+• Project filter in the session list (worktrees count as the same project)
+• Works from outside my house through an https tunnel, not just on my desk
+
+If opencode web covers your case, use it — it's official and it's good. Mine is
+for when you're away from the keyboard.
+```
+
+> **Por qué contestar así:** reconocer lo oficial y decir en qué te diferencias es
+> lo que te da credibilidad. Si intentas fingir que `opencode web` no existe, te
+> van a pillar y el post se te cae. Y decir "si te sirve el oficial, úsalo" hace
+> que la gente confíe en ti.
+
 ---
 
 ## 2️⃣ REDDIT (r/opencodeCLI, r/opencode, r/vibecoding, r/LocalLLM)
@@ -173,12 +231,14 @@ gh repo edit axi010/opencode-mobile-pwa --homepage https://axi010.github.io/open
 
 ## 5️⃣ Checklist
 
-- [ ] Discord de opencode (canal showcase)
-- [ ] r/opencodeCLI
-- [ ] r/opencode
-- [ ] Compañeros de clase (feedback rápido)
-- [ ] Grabar un **GIF de 10 s** del chat en el móvil → mejor que una captura
-- [ ] Añadir el GIF al README
+- [x] ~~Grabar un GIF del chat~~ → hecho (`screenshots/demo.gif`, 9 s)
+- [x] ~~Añadir el GIF al README~~ → hecho (arriba, en ambos idiomas)
+- [ ] **Discord de opencode** (canal showcase) ← empieza por aquí
+- [ ] **r/opencode** (el de galería: 4 imágenes + enlace en el primer comentario)
+- [ ] **r/opencodeCLI** (lee las normas antes: autopromoción dudosa)
+- [ ] **r/SideProject** y **r/coolgithubprojects** (público general)
+- [ ] Compañeros de clase (feedback rápido y sin presión)
+- [ ] Tener lista la respuesta a *"¿en qué se diferencia de opencode web?"*
 
 > 💡 **Consejo**: publica en **uno** primero (Discord), mira qué te preguntan, y
 > **mejora el README** con eso antes de ir a los demás. Si te preguntan lo mismo
