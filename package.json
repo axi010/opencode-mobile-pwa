@@ -26,8 +26,5 @@
   "devDependencies": {
     "qrcode": "^1.5.4",
     "vite": "^7.1.0"
-  },
-  "dependencies": {
-    "web-push": "^3.6.7"
   }
 }
