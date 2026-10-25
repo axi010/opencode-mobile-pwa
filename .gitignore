@@ -27,3 +27,6 @@ desktop.ini
 # Utilidades locales de capturas (no forman parte de la app)
 public/__demo-mock.js
 
+# Copia local de capturas con nombres ordenados, solo para subirlas a Reddit
+screenshots/para-reddit/
+

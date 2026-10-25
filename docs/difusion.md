@@ -59,67 +59,79 @@ Feedback and PRs very welcome — there are "good first issue" tasks ready 🙌
 
 ## 2️⃣ REDDIT (r/opencodeCLI, r/opencode, r/vibecoding, r/LocalLLM)
 
-### 🎯 VERSIÓN RECOMENDADA — con tu edad (16)
+> ⚠️ **En Reddit NO se pueden poner fotos Y enlace en el mismo post.** O subes
+> imágenes (y el enlace va en el **primer comentario**), o haces un post de texto
+> (y el enlace va dentro, pero las fotos no se ven). **Recomendado: galería de
+> imágenes + enlace en el primer comentario** — es lo que más clics consigue,
+> porque ven el GIF antes de decidir.
+
+### 🖼️ POST DE GALERÍA (recomendado — fotos + que la prueben)
+
+**Qué subir, en este orden** (el GIF primero: es lo que engancha):
+
+1. `screenshots/demo.gif` ← el GIF animado, va primero
+2. `screenshots/sessions.png`
+3. `screenshots/chat.png`
+4. `screenshots/permissions.png`
+
+Están en tu carpeta `opencode-mobile/screenshots/`. En Reddit: *Create post* →
+pestaña **Images & Video** → arrastra las 4 en ese orden.
 
 **Título:**
 ```
-I'm 16 and I built a mobile client for opencode: chat, permissions, Plan/Build, model picker (PWA, no frameworks)
+I'm 16 and built a mobile client for opencode — chat, permissions, Plan/Build, model picker (PWA, no frameworks)
 ```
 
-**Cuerpo:**
+**⚠️ El enlace NO va en el post: va en el PRIMER COMENTARIO.** Publícalo tú
+mismo justo después y fíjalo (*pin*). Pega esto:
 
 ```
-Hi! I'm 16, still learning to code, and I use opencode every day.
-
-My problem was simple: I was always walking back to my PC just to approve a
-permission or switch models. So I built a phone client for it. It's the first
-project I've actually finished, and I'd love honest feedback.
-
-▶️ Live demo (fake data, nothing to install):
+▶️ Try it right now, nothing to install (fake data):
 https://axi010.github.io/opencode-mobile-pwa/
+
+Why I built it: I use opencode every day and kept walking back to the PC just to
+approve a permission or switch models. So I made a phone client for it.
 
 What it does
 • Real-time chat (SSE) with reasoning, tool chips and a stop button
 • Approve/reject permissions from the phone (once / always / reject)
 • Plan ⇄ Build switch, model + variant picker (130+ models, searchable)
 • Attach files from your PC to a prompt
-• System view: MCP servers (connect/disconnect), providers, plugins, skills
-• Search + sort + filter by project in the session list
-• PIN lock, light/dark theme, ES/EN UI
-• Real push notifications that arrive with the app closed (small service you
-  run next to opencode — no third party)
+• Search, sort and filter by project in the session list
+• PIN lock, light/dark theme, ES/EN interface
+• Push notifications that arrive with the app closed (small service you run next
+  to opencode — no third party)
 
-Why it's small
-• No frameworks and zero runtime dependencies: vanilla JS + a ~20-line DOM helper
-• ~32 kB gzipped in total, strict CSP in production (no inline scripts/styles)
-• The opencode HTTP API only allows CORS from loopback, so the app calls /api on
-  its own origin and Vite proxies it to 127.0.0.1:28894. The same code works on
-  localhost, on your LAN and behind an https tunnel.
+Tech notes
+• No frameworks, zero runtime dependencies: vanilla JS + a ~20-line DOM helper
+• ~32 kB gzipped total, strict CSP in production (no inline scripts/styles)
+• The opencode API only allows CORS from loopback, so the app calls /api on its
+  own origin and Vite proxies it to 127.0.0.1:28894 → works on localhost, LAN and
+  behind an https tunnel
 
-Things I got wrong (and what I learned)
-• I found real accessibility bugs only after measuring with Lighthouse, not by
-  looking at it: missing <main> landmarks, a heading order that skipped a level,
-  and two buttons that were literally unreadable in light theme. All fixed and
-  documented in ACCESSIBILITY.md, including what is still limited.
-• My first push implementation only worked with the app open. Local
-  notifications can't do more than that — a notification needs code running, so
-  with the app closed the only real option is Web Push (VAPID), which needs a
-  service. I wrote that service.
-• I had never written tests. Adding them (27 now, Node's built-in runner, no
-  dependencies) caught a bug I'd shipped.
-
-📦 Repo (2-command setup) + roadmap with "good first issue" tasks:
+📦 Repo (2-command setup) + "good first issue" tasks:
 https://github.com/axi010/opencode-mobile-pwa
 
-Unofficial and community-made, not affiliated with the OpenCode team.
+Unofficial, community-made, not affiliated with the OpenCode team.
 If something is broken or missing, tell me — I'd rather know.
 ```
 
-> **Por qué funciona este post:** la edad es el gancho, pero **no** es la
-> excusa. Enseguida pasa a lo que importa (el problema, lo que hace) y la
-> sección de *"things I got wrong"* es lo que te diferencia: demuestra que
-> entiendes lo que has hecho y que aceptas críticas. Eso es justo lo que
-> premia Reddit y lo que te va a traer feedback útil en vez de solo "nice!".
+### 📝 ALTERNATIVA: POST DE TEXTO (si prefieres que el enlace se vea arriba)
+
+**Título:** el mismo de arriba.
+
+**Cuerpo:** el texto del comentario de arriba, con el enlace al principio.
+**Contra:** las fotos **no se ven** en el cuerpo; tendrías que poner los enlaces
+de imagen (y Reddit solo los muestra como enlaces, no incrustados).
+
+### 🎯 POR QUÉ ESTE ORDEN FUNCIONA
+
+- **El GIF primero**: en 9 segundos se entiende qué es sin leer nada. Es lo que
+  decide si bajan a leer.
+- **El enlace en un comentario fijado**: los posts con imágenes tienen mucho más
+  alcance que los de solo texto, y el comentario fijado se ve igual.
+- **La edad en el título**: es un gancho honesto y hace que te respondan con
+  paciencia en vez de asumir que eres un dev senior.
 
 ### Versión sin la edad (si prefieres no decirlo)
 
@@ -127,8 +139,6 @@ If something is broken or missing, tell me — I'd rather know.
 ```
 I built a phone client for opencode: chat, permissions, Plan/Build, model picker (PWA, no frameworks)
 ```
-
-**Cuerpo:** usa el mismo texto de arriba quitando la primera frase sobre la edad.
 
 > Reddit **no** incrusta imágenes del cuerpo: usa el enlace, o súbelas como
 > *image post* y pon el texto en un comentario.
