@@ -63,7 +63,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Keyboard shortcuts** (desktop): `Ctrl/Cmd+K` to search, `Enter` to send, `Shift+Enter` for a line break, `Esc` to close.
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
 - **Real push notifications** (Web Push / VAPID): they arrive **with the app closed**. Includes a tiny push service (`server/push-server.mjs`) you run next to opencode — no third party involved.
-- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~50 kB gzipped.
+- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~32 kB gzipped (JS + CSS).
 
 ## 📱 Platform support
 
@@ -264,7 +264,7 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Atajos de teclado** (escritorio): `Ctrl/Cmd+K` para buscar, `Enter` para enviar, `Shift+Enter` para salto de línea y `Esc` para cerrar.
 - **Notificaciones locales** cuando el agente pide un permiso y no estás mirando la app.
 - **Notificaciones push reales** (Web Push / VAPID): llegan con la **app cerrada**. Incluye un servicio push mínimo (`server/push-server.mjs`) que corres junto a opencode, sin depender de terceros.
-- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 50 kB comprimidos.
+- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 32 kB comprimidos (JS + CSS).
 
 ## 📱 Compatibilidad de plataformas
 

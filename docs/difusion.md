@@ -24,8 +24,9 @@ en el canal de **showcase / community-projects**. Lee las normas del canal antes
 ```
 🛠 OpenCode Móvil — drive your opencode server from your phone
 
-I use opencode all day but kept walking back to the PC just to approve a
-permission or switch models. So I built a small PWA for that.
+Hi! I'm 16, still learning, and I use opencode every day. I kept walking back
+to the PC just to approve a permission or switch models, so I built a small PWA
+for that. First project I've actually finished — feedback very welcome 🙏
 
 ▶️ Try it right now (fake data, nothing to install):
 https://axi010.github.io/opencode-mobile-pwa/
@@ -38,11 +39,13 @@ What it does
 • Plan ⇄ Build switch, model + variant picker (130+ models, searchable)
 • Attach files from your PC to a prompt
 • System view: MCP servers (connect/disconnect), providers, plugins, skills
-• PIN lock, light/dark theme, local notifications, ES/EN UI
+• Search, sort and filter by project in the session list
+• PIN lock, light/dark theme, ES/EN UI
+• Real push notifications with the app closed (small service next to opencode)
 
 Why it's small
 • No frameworks, zero runtime dependencies — vanilla JS + a ~20-line DOM helper
-• Strict CSP in production, ~50 kB gzipped
+• ~32 kB gzipped total, strict CSP in production (no inline scripts/styles)
 • The opencode API only allows CORS from loopback, so it talks to /api on its own
   origin (Vite proxies it) → works on localhost, LAN and through an https tunnel
 
@@ -56,39 +59,79 @@ Feedback and PRs very welcome — there are "good first issue" tasks ready 🙌
 
 ## 2️⃣ REDDIT (r/opencodeCLI, r/opencode, r/vibecoding, r/LocalLLM)
 
+### 🎯 VERSIÓN RECOMENDADA — con tu edad (16)
+
+**Título:**
+```
+I'm 16 and I built a mobile client for opencode: chat, permissions, Plan/Build, model picker (PWA, no frameworks)
+```
+
+**Cuerpo:**
+
+```
+Hi! I'm 16, still learning to code, and I use opencode every day.
+
+My problem was simple: I was always walking back to my PC just to approve a
+permission or switch models. So I built a phone client for it. It's the first
+project I've actually finished, and I'd love honest feedback.
+
+▶️ Live demo (fake data, nothing to install):
+https://axi010.github.io/opencode-mobile-pwa/
+
+What it does
+• Real-time chat (SSE) with reasoning, tool chips and a stop button
+• Approve/reject permissions from the phone (once / always / reject)
+• Plan ⇄ Build switch, model + variant picker (130+ models, searchable)
+• Attach files from your PC to a prompt
+• System view: MCP servers (connect/disconnect), providers, plugins, skills
+• Search + sort + filter by project in the session list
+• PIN lock, light/dark theme, ES/EN UI
+• Real push notifications that arrive with the app closed (small service you
+  run next to opencode — no third party)
+
+Why it's small
+• No frameworks and zero runtime dependencies: vanilla JS + a ~20-line DOM helper
+• ~32 kB gzipped in total, strict CSP in production (no inline scripts/styles)
+• The opencode HTTP API only allows CORS from loopback, so the app calls /api on
+  its own origin and Vite proxies it to 127.0.0.1:28894. The same code works on
+  localhost, on your LAN and behind an https tunnel.
+
+Things I got wrong (and what I learned)
+• I found real accessibility bugs only after measuring with Lighthouse, not by
+  looking at it: missing <main> landmarks, a heading order that skipped a level,
+  and two buttons that were literally unreadable in light theme. All fixed and
+  documented in ACCESSIBILITY.md, including what is still limited.
+• My first push implementation only worked with the app open. Local
+  notifications can't do more than that — a notification needs code running, so
+  with the app closed the only real option is Web Push (VAPID), which needs a
+  service. I wrote that service.
+• I had never written tests. Adding them (27 now, Node's built-in runner, no
+  dependencies) caught a bug I'd shipped.
+
+📦 Repo (2-command setup) + roadmap with "good first issue" tasks:
+https://github.com/axi010/opencode-mobile-pwa
+
+Unofficial and community-made, not affiliated with the OpenCode team.
+If something is broken or missing, tell me — I'd rather know.
+```
+
+> **Por qué funciona este post:** la edad es el gancho, pero **no** es la
+> excusa. Enseguida pasa a lo que importa (el problema, lo que hace) y la
+> sección de *"things I got wrong"* es lo que te diferencia: demuestra que
+> entiendes lo que has hecho y que aceptas críticas. Eso es justo lo que
+> premia Reddit y lo que te va a traer feedback útil en vez de solo "nice!".
+
+### Versión sin la edad (si prefieres no decirlo)
+
 **Título:**
 ```
 I built a phone client for opencode: chat, permissions, Plan/Build, model picker (PWA, no frameworks)
 ```
 
-**Cuerpo** (Reddit **no** incrusta imágenes del cuerpo: usa el enlace, o súbelas
-como *image post* y pon el texto en un comentario):
+**Cuerpo:** usa el mismo texto de arriba quitando la primera frase sobre la edad.
 
-```
-I use opencode all day, but I kept having to go back to the PC just to approve a
-permission or change the model. So I built a small PWA for that.
-
-▶️ Live demo (fake data, nothing to install): https://axi010.github.io/opencode-mobile-pwa/
-
-What it does:
-• Real-time chat (SSE) with reasoning, tool chips and a stop button
-• Approve/reject permissions from the phone (once / always / reject)
-• Plan/Build switch + model & variant picker (130+ models, searchable)
-• Attach files from the PC to a prompt
-• System view: MCP servers (connect/disconnect), providers, plugins, skills
-• PIN lock, light/dark theme, notifications, ES/EN interface
-
-Tech notes that might interest this sub:
-• No frameworks and zero runtime dependencies (vanilla JS + tiny DOM helper)
-• The opencode HTTP API only allows CORS from loopback → the app calls /api on its
-  own origin and Vite proxies it to 127.0.0.1:28894. Same code works on localhost,
-  LAN and behind an https tunnel.
-• Strict CSP in production: no inline scripts or styles at all.
-
-📦 Repo: https://github.com/axi010/opencode-mobile-pwa
-
-Unofficial, not affiliated with the OpenCode team. Happy to hear what's missing!
-```
+> Reddit **no** incrusta imágenes del cuerpo: usa el enlace, o súbelas como
+> *image post* y pon el texto en un comentario.
 
 ---
 
