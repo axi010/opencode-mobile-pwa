@@ -50,7 +50,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 
 - **Real-time chat** with streaming responses (SSE), reasoning, tool chips and a stop button.
 - **Search** inside a conversation (highlight + jump between matches) and **copy the whole chat as Markdown**.
-- **Session list with search and sorting** (recent / oldest / name).
+- **Session list with search, sorting and project filter** (recent / oldest / name; the project filter appears only when you have more than one project).
 - **System view**: MCP servers (connect/disconnect), model providers, plugins, skills and commands.
 - **Bilingual UI** (Spanish / English), auto-detected from your browser.
 - **Resilient connection**: the event stream reconnects with **exponential back-off** (1 s → 30 s + jitter).
@@ -215,7 +215,7 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 
 - **Chat en tiempo real** con respuestas en streaming (SSE), razonamiento, chips de herramientas y botón de detener.
 - **Buscar dentro de la conversación** (resalta y salta entre coincidencias) y **copiar todo el chat en Markdown**.
-- **Lista de sesiones con buscador y orden** (recientes / antiguas / nombre).
+- **Lista de sesiones con buscador, orden y filtro por proyecto** (recientes / antiguas / nombre; el filtro por proyecto aparece solo si tienes más de uno).
 - **Vista Sistema**: servidores MCP (conectar/desconectar), proveedores de modelos, plugins, skills y comandos.
 - **Interfaz bilingüe** (español / inglés), detectada automáticamente del navegador.
 - **Conexión resistente**: el stream se reconecta con **backoff exponencial** (1 s → 30 s + jitter).
