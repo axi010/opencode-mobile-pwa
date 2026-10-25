@@ -4,6 +4,7 @@ import { h, timeAgo, toast } from "../ui/dom.js";
 import { Client } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 import { t } from "../i18n.js";
+import { filtrarSesiones, proyectosUnicos, nombresDeProyectos } from "../ui/sesiones-filtro.js";
 
 const LAST_DIR_KEY = "ocmovil.lastDir";
 const ORDEN_KEY = "ocmovil.ordenSesiones";
@@ -53,7 +54,18 @@ export async function sessionsView(_params, root, signal) {
     h("option", { value: "antiguas" }, t("Antiguas")),
     h("option", { value: "nombre" }, t("Nombre"))
   );
-  const barra = h("div", { class: "lista-barra" }, buscar, ordenSel);
+  /* Filtro por proyecto. Solo se muestra si hay MAS DE UN proyecto con sesiones
+     (con uno solo no aporta nada y ocupa sitio). Se filtra por `projectID`, no
+     por directorio: un proyecto puede tener varias carpetas (worktrees) y todas
+     pertenecen al mismo proyecto. */
+  const proyectoKey = "ocmovil.filtroProyecto";
+  const proyectoSel = h("select", {
+    class: "proyecto",
+    hidden: true,
+    title: t("Filtrar por proyecto"),
+    "aria-label": t("Filtrar por proyecto"),
+  });
+  const barra = h("div", { class: "lista-barra" }, buscar, proyectoSel, ordenSel);
   const main = h("main", { class: "main" });
   main.append(barra);
   root.append(main);
@@ -139,24 +151,55 @@ export async function sessionsView(_params, root, signal) {
     );
   }
 
-  /* Aplica busqueda (nombre/id) + orden elegido. Sin peticiones: se hace sobre
-     la lista ya descargada. */
+  /* Aplica busqueda (nombre/id) + filtro por proyecto + orden elegido.
+     Todo en memoria: sin peticiones extra. La logica pura vive en
+     ui/sesiones-filtro.js para poder probarla sin DOM. */
   function filtrarYOrdenar(items) {
-    const q = buscar.value.trim().toLowerCase();
-    let lista = items;
-    if (q) {
-      lista = items.filter((s) =>
-        `${s.title || ""} ${s.id} ${s.model?.id || ""}`.toLowerCase().includes(q)
-      );
+    return filtrarSesiones(items, {
+      proyecto: proyectoSel.value,
+      texto: buscar.value,
+      orden: ordenSel.value,
+    });
+  }
+
+  /* Rellena el selector de proyectos a partir de las sesiones cargadas y de la
+     lista de proyectos del servidor. Solo se muestra si hay mas de uno.
+     Se recalcula cuando CAMBIA el conjunto de proyectos (p. ej. si el usuario
+     crea una sesion en otra carpeta), no solo la primera vez. */
+  let proyectosVistos = "";
+  async function cargarProyectos(sesiones) {
+    const ids = proyectosUnicos(sesiones);
+    const firmaProy = ids.join(",");
+    if (firmaProy === proyectosVistos) return; // sin cambios: no se toca el DOM
+    proyectosVistos = firmaProy;
+    if (ids.length <= 1) {
+      // un solo proyecto: el filtro no aporta, se oculta
+      proyectoSel.hidden = true;
+      return;
     }
-    const orden = ordenSel.value;
-    const t = (s) => s.time?.updated || s.time?.created || 0;
-    const copia = [...lista];
-    if (orden === "antiguas") copia.sort((a, b) => t(a) - t(b));
-    else if (orden === "nombre")
-      copia.sort((a, b) => (a.title || a.id).localeCompare(b.title || b.id));
-    else copia.sort((a, b) => t(b) - t(a)); // recientes (por defecto)
-    return copia;
+    let nombres = {};
+    try {
+      const r = await Client.projects();
+      const arr = Array.isArray(r) ? r : r?.data || [];
+      nombres = nombresDeProyectos(ids, arr);
+    } catch {
+      /* si falla, se usan los IDs recortados */
+    }
+    const previo = (() => {
+      try {
+        return localStorage.getItem(proyectoKey) || "*";
+      } catch {
+        return "*";
+      }
+    })();
+    proyectoSel.textContent = "";
+    proyectoSel.append(h("option", { value: "*" }, t("Todos los proyectos")));
+    for (const id of ids) {
+      proyectoSel.append(h("option", { value: id }, nombres[id] || id.slice(0, 8)));
+    }
+    proyectoSel.hidden = false;
+    // si el proyecto guardado ya no existe, se vuelve a "todos"
+    proyectoSel.value = ids.includes(previo) ? previo : "*";
   }
 
   function pintarLista(items) {
@@ -166,13 +209,13 @@ export async function sessionsView(_params, root, signal) {
       title: s.title || s.id,
       sub: `${timeAgo(s.time?.created || Date.now())}${s.model?.id ? ` · ${s.model.id}` : ""}`,
     }));
-    // la firma incluye el filtro para que un cambio de busqueda repinte
-    const firma = JSON.stringify([filas, buscar.value, ordenSel.value]);
+    // la firma incluye los filtros para que un cambio repinte al instante
+    const firma = JSON.stringify([filas, buscar.value, ordenSel.value, proyectoSel.value]);
     if (firma === firmaLista) return; // sin cambios: ni se toca el DOM
     firmaLista = firma;
     vacio.hidden = filas.length > 0;
-    if (!filas.length && buscar.value.trim()) {
-      // hay busqueda y no hay resultados: mensaje especifico
+    if (!filas.length && (buscar.value.trim() || proyectoSel.value !== "*")) {
+      // hay filtro activo y no hay resultados: mensaje especifico
       vacio.querySelector(".empty-title").textContent = t("Sin resultados");
       vacio.querySelector(".hint").textContent = t("Prueba con otro texto o borra la búsqueda.");
     } else {
@@ -214,6 +257,15 @@ export async function sessionsView(_params, root, signal) {
   } catch {
     /* por defecto recientes */
   }
+  // cambiar de proyecto repinta al instante y recuerda la eleccion
+  proyectoSel.addEventListener("change", () => {
+    try {
+      localStorage.setItem(proyectoKey, proyectoSel.value);
+    } catch {
+      /* best-effort */
+    }
+    pintarLista(todas);
+  });
 
   async function refresh() {
     try {
@@ -222,6 +274,8 @@ export async function sessionsView(_params, root, signal) {
         Client.allPendingPermissions(), // best-effort: nunca rechaza
       ]);
       todas = ses?.data || [];
+      // el selector de proyectos se recalcula si cambia el conjunto de proyectos
+      await cargarProyectos(todas);
       pintarLista(todas);
       pintarBadge(perms.length);
     } catch (err) {

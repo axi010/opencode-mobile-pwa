@@ -16,6 +16,12 @@ import {
   absoluta,
   rutaAFileUri,
 } from "../src/ui/chat-controls.js";
+import {
+  nombreProyecto,
+  proyectosUnicos,
+  filtrarSesiones,
+  nombresDeProyectos,
+} from "../src/ui/sesiones-filtro.js";
 
 /* ---------------- escapeHtml ---------------- */
 test("escapeHtml neutraliza los caracteres peligrosos", () => {
@@ -116,4 +122,71 @@ test("absoluta reconstruye la ruta completa con el separador correcto", () => {
   // si ya es absoluta, se respeta
   assert.equal(absoluta("C:\\Users\\yo", "D:\\otra\\cosa.txt"), "D:\\otra\\cosa.txt");
   assert.equal(absoluta("/home/yo", "/etc/hosts"), "/etc/hosts");
+});
+
+/* ---------------- filtro por proyecto ---------------- */
+const SESIONES = [
+  { id: "a1", title: "Web de recetas", projectID: "P1", time: { created: 100, updated: 500 } },
+  { id: "a2", title: "Refactor carrito", projectID: "P1", time: { created: 200, updated: 300 } },
+  { id: "b1", title: "API de tareas", projectID: "P2", time: { created: 300, updated: 900 } },
+  { id: "b2", title: "Script backups", projectID: "P2", time: { created: 400, updated: 100 } },
+];
+
+test("nombreProyecto usa el nombre, si no la carpeta, si no el id", () => {
+  assert.equal(nombreProyecto({ id: "x", name: "Mi proyecto", canonical: "/a/b" }), "Mi proyecto");
+  assert.equal(nombreProyecto({ id: "x", canonical: "C:\\ruta\\mi-carpeta" }), "mi-carpeta");
+  assert.equal(nombreProyecto({ id: "x", canonical: "/home/yo/proyecto/" }), "proyecto");
+  assert.equal(nombreProyecto({ id: "abcdef1234567890" }), "abcdef12");
+});
+
+test("proyectosUnicos devuelve los IDs distintos, ordenados y sin vacios", () => {
+  assert.deepEqual(proyectosUnicos(SESIONES), ["P1", "P2"]);
+  assert.deepEqual(proyectosUnicos([{ id: "x" }, { projectID: null }]), []);
+  assert.deepEqual(proyectosUnicos([]), []);
+});
+
+test("filtrarSesiones filtra por proyecto", () => {
+  const p1 = filtrarSesiones(SESIONES, { proyecto: "P1" });
+  assert.deepEqual(p1.map((s) => s.id), ["a1", "a2"]);
+  const todos = filtrarSesiones(SESIONES, { proyecto: "*" });
+  assert.equal(todos.length, 4);
+});
+
+test("filtrarSesiones busca por titulo, id y modelo", () => {
+  assert.deepEqual(filtrarSesiones(SESIONES, { texto: "carrito" }).map((s) => s.id), ["a2"]);
+  assert.deepEqual(filtrarSesiones(SESIONES, { texto: "b1" }).map((s) => s.id), ["b1"]);
+  const conModelo = [{ id: "z", title: "x", model: { id: "claude-sonnet" } }];
+  assert.equal(filtrarSesiones(conModelo, { texto: "sonnet" }).length, 1);
+});
+
+test("filtrarSesiones ordena por recientes, antiguas y nombre", () => {
+  assert.deepEqual(
+    filtrarSesiones(SESIONES, { orden: "recientes" }).map((s) => s.id),
+    ["b1", "a1", "a2", "b2"]
+  );
+  assert.deepEqual(
+    filtrarSesiones(SESIONES, { orden: "antiguas" }).map((s) => s.id),
+    ["b2", "a2", "a1", "b1"]
+  );
+  assert.deepEqual(
+    filtrarSesiones(SESIONES, { orden: "nombre" }).map((s) => s.title),
+    ["API de tareas", "Refactor carrito", "Script backups", "Web de recetas"]
+  );
+});
+
+test("filtrarSesiones combina proyecto + texto + orden", () => {
+  const r = filtrarSesiones(SESIONES, { proyecto: "P1", texto: "web", orden: "recientes" });
+  assert.deepEqual(r.map((s) => s.id), ["a1"]);
+});
+
+test("nombresDeProyectos cae al id corto si el proyecto no esta", () => {
+  const ids = ["P1", "P2", "P9"];
+  const proyectos = [
+    { id: "P1", name: "Uno" },
+    { id: "P2", canonical: "/home/yo/dos" },
+  ];
+  const r = nombresDeProyectos(ids, proyectos);
+  assert.equal(r.P1, "Uno");
+  assert.equal(r.P2, "dos");
+  assert.equal(r.P9, "P9");
 });

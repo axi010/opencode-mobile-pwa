@@ -135,6 +135,10 @@ export const Client = {
   location: () => api("GET", "/api/location"),
   agents: () => api("GET", "/api/agent"),
   sessions: (limit = 50) => api("GET", `/api/session?limit=${limit}`),
+  /* Lista de proyectos conocidos por el servidor. Cada proyecto trae
+     {id, canonical, name, vcs}. Las sesiones referencian el proyecto por
+     `projectID`, asi que esto sirve para poner un NOMBRE al filtro. */
+  projects: () => api("GET", "/api/project"),
   getSession: (id) => api("GET", `/api/session/${id}`),
   deleteSession: (id) => api("DELETE", `/api/session/${id}`),
   createSession: (directory) => api("POST", "/api/session", { location: { directory } }),

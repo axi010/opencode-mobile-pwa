@@ -88,6 +88,8 @@ const EN = {
   "No hay nada que copiar": "Nothing to copy",
   "No se pudo copiar": "Could not copy",
   "Ordenar": "Sort",
+  "Filtrar por proyecto": "Filter by project",
+  "Todos los proyectos": "All projects",
   "Recientes": "Recent",
   "Antiguas": "Oldest",
   "Nombre": "Name",

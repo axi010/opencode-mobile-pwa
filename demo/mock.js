@@ -33,12 +33,21 @@
 
   const esDemo = () => (leerConfig().baseUrl || "") === DEMO_URL;
 
-  /* ---------- datos ficticios ---------- */
+  /* ---------- datos ficticios ----------
+     Dos proyectos distintos para que el filtro por proyecto sea visible en la
+     demo (con un solo proyecto el selector se oculta, por diseno). */
+  const PROY_A = "proj_demo_web_0001";
+  const PROY_B = "proj_demo_api_0002";
   const SES = [
-    { id: "ses_demo01", title: "Web de recetas", agent: "build", model: { id: "claude-sonnet-5", providerID: "anthropic" }, time: { created: Date.now() - 240000, updated: Date.now() - 60000 } },
-    { id: "ses_demo02", title: "Refactor del carrito", agent: "plan", model: { id: "gemini-4-argon", providerID: "google", variant: "high" }, time: { created: Date.now() - 3600000, updated: Date.now() - 1800000 } },
-    { id: "ses_demo03", title: "Script de backups", agent: "build", model: { id: "deepseek-v4.1-flash", providerID: "standardcompute" }, time: { created: Date.now() - 86400000, updated: Date.now() - 7200000 } },
-    { id: "ses_demo04", title: "API de tareas", agent: "build", model: { id: "claude-haiku-5-5", providerID: "anthropic" }, time: { created: Date.now() - 172800000, updated: Date.now() - 90000000 } },
+    { id: "ses_demo01", title: "Web de recetas", projectID: PROY_A, agent: "build", model: { id: "claude-sonnet-5", providerID: "anthropic" }, time: { created: Date.now() - 240000, updated: Date.now() - 60000 } },
+    { id: "ses_demo02", title: "Refactor del carrito", projectID: PROY_A, agent: "plan", model: { id: "gemini-4-argon", providerID: "google", variant: "high" }, time: { created: Date.now() - 3600000, updated: Date.now() - 1800000 } },
+    { id: "ses_demo03", title: "Script de backups", projectID: PROY_B, agent: "build", model: { id: "deepseek-v4.1-flash", providerID: "standardcompute" }, time: { created: Date.now() - 86400000, updated: Date.now() - 7200000 } },
+    { id: "ses_demo04", title: "API de tareas", projectID: PROY_B, agent: "build", model: { id: "claude-haiku-5-5", providerID: "anthropic" }, time: { created: Date.now() - 172800000, updated: Date.now() - 90000000 } },
+  ];
+
+  const PROYECTOS = [
+    { id: PROY_A, canonical: "/demo/proyecto-web", name: "Web de recetas", vcs: "git" },
+    { id: PROY_B, canonical: "/demo/proyecto-api", name: "API de tareas", vcs: "git" },
   ];
 
   const TEXTO = [
@@ -162,6 +171,7 @@
       return Promise.resolve(json({ data: SES.find((s) => s.id === id) || SES[0] }));
     }
     if (u.includes("/api/session?limit")) return Promise.resolve(json({ data: SES }));
+    if (u.includes("/api/project")) return Promise.resolve(json(PROYECTOS));
     if (u.includes("/api/model")) return Promise.resolve(json({ location: { directory: "/demo/proyecto" }, data: MODELOS }));
     if (u.includes("/api/agent")) return Promise.resolve(json({ data: AGENTES }));
     if (u.includes("/api/location")) return Promise.resolve(json({ directory: "/demo/proyecto" }));

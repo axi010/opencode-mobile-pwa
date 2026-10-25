@@ -269,6 +269,7 @@ mark.resaltado.activa {
 }
 .lista-barra .buscar { flex: 1; min-width: 0; }
 .lista-barra .orden { flex: 0 0 auto; width: auto; max-width: 42%; padding: 10px; }
+.lista-barra .proyecto { flex: 0 0 auto; width: auto; max-width: 38%; padding: 10px; }
 
 /* ---- chat ---- */
 .banner {
