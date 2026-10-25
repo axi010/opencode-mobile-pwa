@@ -22,6 +22,7 @@ import {
   filtrarSesiones,
   nombresDeProyectos,
 } from "../src/ui/sesiones-filtro.js";
+import { resolverAtajo } from "../src/ui/atajos.js";
 
 /* ---------------- escapeHtml ---------------- */
 test("escapeHtml neutraliza los caracteres peligrosos", () => {
@@ -189,4 +190,38 @@ test("nombresDeProyectos cae al id corto si el proyecto no esta", () => {
   assert.equal(r.P1, "Uno");
   assert.equal(r.P2, "dos");
   assert.equal(r.P9, "P9");
+});
+
+/* ---------------- atajos de teclado ---------------- */
+const ev = (o) => ({ key: "", ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...o });
+
+test("resolverAtajo detecta Ctrl+K y Cmd+K", () => {
+  assert.equal(resolverAtajo(ev({ key: "k", ctrlKey: true })), "buscar");
+  assert.equal(resolverAtajo(ev({ key: "K", ctrlKey: true })), "buscar");
+  assert.equal(resolverAtajo(ev({ key: "k", metaKey: true })), "buscar"); // macOS
+});
+
+test("resolverAtajo NO confunde K sola ni con modificadores de mas", () => {
+  assert.equal(resolverAtajo(ev({ key: "k" })), null);
+  assert.equal(resolverAtajo(ev({ key: "k", ctrlKey: true, shiftKey: true })), null);
+  assert.equal(resolverAtajo(ev({ key: "k", ctrlKey: true, altKey: true })), null);
+  assert.equal(resolverAtajo(ev({ key: "j", ctrlKey: true })), null);
+});
+
+test("resolverAtajo detecta Escape", () => {
+  assert.equal(resolverAtajo(ev({ key: "Escape" })), "cerrar");
+  assert.equal(resolverAtajo(ev({ key: "esc" })), null); // el navegador manda "Escape"
+  assert.equal(resolverAtajo(ev({ key: "Escape", ctrlKey: true })), null);
+});
+
+test("resolverAtajo no se rompe con entradas raras", () => {
+  assert.equal(resolverAtajo(null), null);
+  assert.equal(resolverAtajo(undefined), null);
+  assert.equal(resolverAtajo({}), null);
+  assert.equal(resolverAtajo({ key: 5 }), null);
+});
+
+test("resolverAtajo ignora Enter (lo gestiona el textarea del chat)", () => {
+  assert.equal(resolverAtajo(ev({ key: "Enter" })), null);
+  assert.equal(resolverAtajo(ev({ key: "Enter", shiftKey: true })), null);
 });

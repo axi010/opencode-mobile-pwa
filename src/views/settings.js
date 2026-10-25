@@ -9,6 +9,16 @@ import { getTheme, setTheme, TEMAS } from "../theme.js";
 import { t, IDIOMAS, getIdioma, setIdioma } from "../i18n.js";
 import { notifySoportado, estado as estadoNotif, pedirPermiso, notificar, contextoInseguro } from "../notify.js";
 import {
+  pushCapacidad,
+  pushEstado,
+  activarPush,
+  desactivarPush,
+  probarPush,
+  getPushUrl,
+  setPushUrl,
+} from "../push.js";
+import { esEscritorio } from "../ui/atajos.js";
+import {
   hasPin,
   setPin,
   clearPin,
@@ -245,6 +255,30 @@ export async function settingsView(_params, root, _signal) {
           h("option", { value: i.id, selected: getIdioma() === i.id ? true : false }, i.nombre)))))
   );
 
+  /* ================= ATAJOS DE TECLADO ================= */
+  /* Solo en escritorio (con teclado fisico); en movil no se muestran. */
+  if (esEscritorio()) {
+    main.append(
+      h("section", { class: "sec" }, h("h2", {}, t("Atajos de teclado")),
+        h("p", { class: "hint" }, t("Solo en ordenador (con teclado).")),
+        h("div", { class: "atajos" },
+          h("div", { class: "atajo" },
+            h("kbd", {}, "Ctrl"), h("span", {}, "+"), h("kbd", {}, "K"),
+            h("span", { class: "atajo-desc" }, t("Buscar (en sesiones y en el chat)"))),
+          h("div", { class: "atajo" },
+            h("kbd", {}, "Enter"),
+            h("span", { class: "atajo-desc" }, t("Enviar el mensaje"))),
+          h("div", { class: "atajo" },
+            h("kbd", {}, "Shift"), h("span", {}, "+"), h("kbd", {}, "Enter"),
+            h("span", { class: "atajo-desc" }, t("Salto de línea en el mensaje"))),
+          h("div", { class: "atajo" },
+            h("kbd", {}, "Esc"),
+            h("span", { class: "atajo-desc" }, t("Cerrar la búsqueda o el panel abierto")))
+        ),
+        h("p", { class: "hint" }, t("En macOS, usa Cmd en lugar de Ctrl.")))
+    );
+  }
+
   /* ================= NOTIFICACIONES ================= */
   const secNotif = h("section", { class: "sec" }, h("h2", {}, "Notificaciones"));
   const cajaNotif = h("div", { class: "pin-box" });
@@ -324,11 +358,121 @@ export async function settingsView(_params, root, _signal) {
 
     cajaNotif.append(
       h("p", { class: "hint" },
-        t("Avisos solo en segundo plano y con permiso concedido. Android mantiene la app viva unos 30 s tras ocultarla; pasada esa ventana no puede avisar (sin servidor push)."))
+        t("Avisos solo en segundo plano y con permiso concedido. Android mantiene la app viva unos 30 s tras ocultarla; pasada esa ventana no puede avisar."))
     );
   }
   pintarNotif();
   main.append(secNotif);
+
+  /* ================= NOTIFICACIONES PUSH (app cerrada) =================
+     Las de arriba son LOCALES (necesitan la app viva unos segundos). Estas son
+     PUSH real: llegan con la app cerrada porque el navegador mantiene el canal
+     y el servicio (server/push-server.mjs) lo despierta. */
+  const secPush = h("section", { class: "sec" }, h("h2", {}, t("Notificaciones push (app cerrada)")));
+  const cajaPush = h("div", { class: "pin-box" });
+  secPush.append(cajaPush);
+
+  async function pintarPush() {
+    cajaPush.textContent = "";
+    const cap = pushCapacidad();
+
+    if (!cap.puede) {
+      const motivo =
+        cap.motivo === "inseguro"
+          ? t("⚠ El push necesita HTTPS o localhost. En LAN por HTTP el navegador no lo permite: usa el túnel https (QR).")
+          : cap.motivo === "ios-no-instalada"
+            ? t("En iPhone/iPad, Apple solo permite push a las webs **instaladas** en la pantalla de inicio. Instálala primero (ver arriba).")
+            : t("Este navegador no soporta Web Push.");
+      cajaPush.append(h("p", { class: "hint" }, motivo));
+      return;
+    }
+
+    const url = getPushUrl();
+    const est = await pushEstado();
+
+    cajaPush.append(
+      h("p", { class: "hint" },
+        t("A diferencia de las de arriba, estas llegan con la app CERRADA. Necesitan el servicio push corriendo en tu PC (server/push-server.mjs) y su URL aquí."))
+    );
+
+    // campo de URL del servicio
+    const urlInput = h("input", {
+      type: "url",
+      name: "pushUrl",
+      value: url,
+      placeholder: "https://tu-tunel.trycloudflare.com",
+      autocomplete: "off",
+      spellcheck: "false",
+      "aria-label": t("URL del servicio push"),
+    });
+    cajaPush.append(h("label", {}, t("URL del servicio push"), urlInput));
+
+    const estadoTxt =
+      est === "activo"
+        ? t("✅ Activas en este dispositivo.")
+        : est === "inactivo"
+          ? t("Desactivadas en este dispositivo.")
+          : t("No se pudo comprobar.");
+    cajaPush.append(h("p", { class: "hint" }, estadoTxt));
+
+    const btnGuardar = h("button", {
+      class: "ghost",
+      onClick: async () => {
+        setPushUrl(urlInput.value);
+        toast(t("URL del servicio guardada"));
+        await pintarPush();
+      },
+    }, t("Guardar URL"));
+
+    const btnActivar = h("button", {
+      class: "ghost",
+      onClick: async () => {
+        setPushUrl(urlInput.value);
+        const r = await activarPush();
+        if (!r.ok) {
+          const msg =
+            r.error === "sin-servicio"
+              ? t("Pon primero la URL del servicio push.")
+              : r.error === "denied"
+                ? t("Permiso de notificaciones denegado")
+                : t("No se pudo activar") + ": " + r.error;
+          toast(msg);
+        } else {
+          toast(t("Push activado en este dispositivo"));
+        }
+        await pintarPush();
+      },
+    }, t("Activar push"));
+
+    const btnDesactivar = h("button", {
+      class: "ghost",
+      onClick: async () => {
+        await desactivarPush();
+        toast(t("Push desactivado"));
+        await pintarPush();
+      },
+    }, t("Desactivar push"));
+
+    const btnPrueba = h("button", {
+      class: "ghost",
+      onClick: async () => {
+        const r = await probarPush();
+        toast(r.ok ? t("Aviso de prueba enviado") : t("No se pudo enviar") + ": " + r.error);
+      },
+    }, t("Enviar prueba"));
+
+    const fila = est === "activo"
+      ? h("div", { class: "btn-row" }, btnPrueba, btnDesactivar)
+      : h("div", { class: "btn-row" }, btnActivar);
+    cajaPush.append(fila, h("div", { class: "btn-row" }, btnGuardar));
+
+    cajaPush.append(
+      h("p", { class: "hint" },
+        t("El servicio push se arranca con: node server/push-server.mjs (en tu PC, junto a opencode)."))
+    );
+  }
+  await pintarPush();
+  main.append(secPush);
 
 
   /* ================= DIAGNOSTICO ================= */

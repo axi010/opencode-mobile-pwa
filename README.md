@@ -60,7 +60,9 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Attach files** from the PC: browse your project folders and reference files in your prompt.
 - **Security**: strict CSP in production, **PIN lock** (PBKDF2, brute-force cooldown, auto-lock on inactivity), QR token scrubbing from the URL, "log out" button.
 - **Light / dark / auto theme**, following your system.
+- **Keyboard shortcuts** (desktop): `Ctrl/Cmd+K` to search, `Enter` to send, `Shift+Enter` for a line break, `Esc` to close.
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
+- **Real push notifications** (Web Push / VAPID): they arrive **with the app closed**. Includes a tiny push service (`server/push-server.mjs`) you run next to opencode — no third party involved.
 - **No frameworks**: vanilla JS + a ~20-line DOM helper. ~50 kB gzipped.
 
 ## 📱 Platform support
@@ -71,20 +73,51 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 | PIN lock (needs HTTPS) | ✅ | ✅ | ✅ |
 | Install as an app | ✅ | ✅ (Share → *Add to Home Screen*) | ✅ (Chrome/Edge) |
 | In-app alerts (badge 🛡, chat banner) | ✅ | ✅ | ✅ |
-| System notification when the app is **closed** | ✅ (~30 s window) | ⚠️ **only if installed** + no background wake | ✅ |
-| Background push | ❌ | ❌ | ❌ |
+| System notification when the app is **closed** (local, ~30 s) | ✅ | ⚠️ **only if installed** + no background wake | ✅ |
+| **Real push with the app closed** (own service) | ✅ | ⚠️ **only if installed** (iOS 16.4+) | ✅ |
 
 **Notes**
 
 - **iOS**: Apple only allows web apps **installed on the Home Screen** to notify
   (since iOS 16.4). Even then, iOS does not allow waking the app in the
-  background, so a notification only arrives shortly after you leave the app.
-  The app detects this and tells you what to do. Also: iOS does **not** run the
+  background, so a *local* notification only arrives shortly after you leave the
+  app. The app detects this and tells you what to do. Also: iOS does **not** run the
   PIN over plain `http://` (needs HTTPS) — use the tunnel.
 - **Windows / macOS / Linux as the server**: the file browser works with either
   path separator, so attaching files works with an opencode server on any OS.
-- **No push server**: notifications are local. Real background push would need a
-  small server of your own (see the roadmap).
+- **Notifications come in two layers.** *Local* ones work with nothing else, but
+  only for ~30 s after you hide the app. **Real push** arrives with the app
+  closed and needs the bundled service `server/push-server.mjs` running next to
+  opencode (see below).
+
+## 🔔 Real push notifications (app closed)
+
+Local notifications can only fire while something of the app is still running. To
+notify with the app **closed** you need **Web Push**: the browser keeps a channel
+with its push service (FCM/APNs/Mozilla) and a server of your own wakes it. That
+server ships with the app and runs on your PC.
+
+```bash
+# 1) service dependency (once)
+npm i web-push
+
+# 2) start the service (generates the VAPID keys the first time)
+node server/push-server.mjs
+```
+
+Then, in the app: **Settings → Push notifications**, set the service URL and hit
+*Enable push*.
+
+- **Same machine**: `http://127.0.0.1:8099`
+- **From your phone**: the **https tunnel** URL you use for the app, with `/push`
+  appended (Vite proxies it to the service, so no extra port is exposed).
+
+The VAPID keys and the subscriptions live in `~/.opencode-mobile/` (**never** in
+the repo). The service authenticates with your opencode password, so it only
+answers to whoever already controls opencode.
+
+> **Without the push service** notifications still work in their local version;
+> the app explains this in Settings instead of failing silently.
 
 
 
@@ -161,14 +194,17 @@ opencode-mobile/
 │   └── generar_iconos.ps1
 ├── test/
 │   └── unit.test.js        # unit tests (Node's built-in runner)
+├── server/
+│   └── push-server.mjs     # Web Push service (run next to opencode)
 └── src/
     ├── main.js             # bootstrap, routes, theme, lock
     ├── api/client.js       # HTTP + SSE client
     ├── security.js         # PIN (PBKDF2), inactivity lock
     ├── theme.js            # light/dark/auto
     ├── notify.js           # local notifications
+    ├── push.js             # Web Push subscription (VAPID)
     ├── permisos-avisos.js  # background permission watcher
-    ├── ui/                 # dom.js, router.js, chat-controls.js
+    ├── ui/                 # dom.js, router.js, chat-controls.js, atajos.js
     └── views/              # setup, sessions, chat, permissions, settings
 ```
 
@@ -225,7 +261,9 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Adjuntar archivos** del PC: navega por las carpetas de tu proyecto y referéncialos en el mensaje.
 - **Seguridad**: CSP estricta en producción, **bloqueo con PIN** (PBKDF2, cooldown antifuerza bruta, cierre por inactividad), borrado del token del QR en la URL y botón de cerrar sesión.
 - **Tema claro / oscuro / automático**, siguiendo al sistema.
+- **Atajos de teclado** (escritorio): `Ctrl/Cmd+K` para buscar, `Enter` para enviar, `Shift+Enter` para salto de línea y `Esc` para cerrar.
 - **Notificaciones locales** cuando el agente pide un permiso y no estás mirando la app.
+- **Notificaciones push reales** (Web Push / VAPID): llegan con la **app cerrada**. Incluye un servicio push mínimo (`server/push-server.mjs`) que corres junto a opencode, sin depender de terceros.
 - **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 50 kB comprimidos.
 
 ## 📱 Compatibilidad de plataformas
@@ -236,21 +274,52 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 | PIN (necesita HTTPS) | ✅ | ✅ | ✅ |
 | Instalar como app | ✅ | ✅ (Compartir → *Añadir a pantalla de inicio*) | ✅ (Chrome/Edge) |
 | Avisos en la app (badge 🛡, banner del chat) | ✅ | ✅ | ✅ |
-| Notificación del sistema con la app **cerrada** | ✅ (~30 s) | ⚠️ **solo si está instalada** + sin despertar en 2º plano | ✅ |
-| Push en segundo plano | ❌ | ❌ | ❌ |
+| Notificación del sistema con la app **cerrada** (local, ~30 s) | ✅ | ⚠️ **solo si está instalada** + sin despertar en 2º plano | ✅ |
+| **Push real con la app cerrada** (servicio propio) | ✅ | ⚠️ **solo si está instalada** (iOS 16.4+) | ✅ |
 
 **Notas**
 
 - **iOS**: Apple solo permite notificar a las webs **instaladas en la pantalla de
   inicio** (desde iOS 16.4). Y aun así, iOS **no permite despertar** la app en
-  segundo plano, así que el aviso llega solo si acabas de salir de la app. La app
+  segundo plano, así que el aviso local llega solo si acabas de salir de la app. La app
   lo detecta y te dice qué hacer. Además, en iOS el **PIN no funciona por
   `http://`** (necesita HTTPS): usa el túnel.
 - **Servidor en Windows / macOS / Linux**: el explorador de archivos funciona con
   cualquier separador de ruta, así que adjuntar archivos va con el servidor
   opencode en cualquier sistema.
-- **Sin servidor push**: las notificaciones son locales. El push real en segundo
-  plano necesitaría un servidor propio pequeño (ver el roadmap).
+- **Notificaciones**: hay **dos capas**. Las *locales* funcionan sin nada más,
+  pero solo durante los ~30 s siguientes a ocultar la app. Las **push reales**
+  llegan con la app cerrada y necesitan el servicio `server/push-server.mjs`
+  corriendo junto a opencode (ver más abajo).
+
+## 🔔 Notificaciones push reales (app cerrada)
+
+Las notificaciones locales solo pueden dispararse mientras algo de la app siga
+corriendo. Para avisar con la **app cerrada** hace falta **Web Push**: el
+navegador mantiene un canal con su servicio push (FCM/APNs/Mozilla) y un
+servicio propio lo despierta. Ese servicio viene incluido y corre en tu PC.
+
+```bash
+# 1) dependencia del servicio (una vez)
+npm i web-push
+
+# 2) arranca el servicio (genera las claves VAPID la primera vez)
+node server/push-server.mjs
+```
+
+Luego, en la app: **Ajustes → Notificaciones push**, pon la URL del servicio y
+pulsa *Activar push*.
+
+- **Misma máquina**: `http://127.0.0.1:8099`
+- **Desde el móvil**: la URL del **túnel https** que uses para la app, con
+  `/push` al final (Vite lo proxya al servicio; no hace falta abrir otro puerto).
+
+Las claves VAPID y las suscripciones se guardan en `~/.opencode-mobile/`
+(**nunca** en el repositorio). El servicio se autentica con la misma contraseña
+de tu opencode, así que solo responde a quien ya controla opencode.
+
+> **Sin servicio push** las notificaciones siguen funcionando en su versión
+> local; la app te lo explica en Ajustes en vez de fallar en silencio.
 
 ## 🔧 Requisitos
 

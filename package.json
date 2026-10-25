@@ -5,16 +5,29 @@
   "description": "Mobile PWA client for your opencode server: streaming chat, permissions, model picker and file attach",
   "license": "MIT",
   "author": "Axier Castro Vega",
-  "keywords": ["opencode", "pwa", "mobile", "client", "sse"],
+  "keywords": [
+    "opencode",
+    "pwa",
+    "mobile",
+    "client",
+    "sse"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test \"test/**/*.test.js\"",
+    "push": "node server/push-server.mjs"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "qrcode": "^1.5.4",
     "vite": "^7.1.0"
+  },
+  "dependencies": {
+    "web-push": "^3.6.7"
   }
 }

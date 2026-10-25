@@ -211,6 +211,41 @@ const EN = {
     "«Auto» follows the system light/dark mode.",
   "Tema": "Theme",
   "Modo compacto (más mensajes en pantalla)": "Compact mode (more messages on screen)",
+  "Atajos de teclado": "Keyboard shortcuts",
+  "Solo en ordenador (con teclado).": "Desktop only (with a keyboard).",
+  "Buscar (en sesiones y en el chat)": "Search (sessions and chat)",
+  "Enviar el mensaje": "Send the message",
+  "Salto de línea en el mensaje": "Line break in the message",
+  "Cerrar la búsqueda o el panel abierto": "Close the search or the open panel",
+  "En macOS, usa Cmd en lugar de Ctrl.": "On macOS, use Cmd instead of Ctrl.",
+
+  /* ---- push ---- */
+  "Notificaciones push (app cerrada)": "Push notifications (app closed)",
+  "A diferencia de las de arriba, estas llegan con la app CERRADA. Necesitan el servicio push corriendo en tu PC (server/push-server.mjs) y su URL aquí.":
+    "Unlike the ones above, these arrive with the app CLOSED. They need the push service running on your PC (server/push-server.mjs) and its URL here.",
+  "URL del servicio push": "Push service URL",
+  "URL del servicio guardada": "Service URL saved",
+  "✅ Activas en este dispositivo.": "✅ Enabled on this device.",
+  "Desactivadas en este dispositivo.": "Disabled on this device.",
+  "No se pudo comprobar.": "Could not check.",
+  "Guardar URL": "Save URL",
+  "Activar push": "Enable push",
+  "Desactivar push": "Disable push",
+  "Enviar prueba": "Send test",
+  "Push activado en este dispositivo": "Push enabled on this device",
+  "Push desactivado": "Push disabled",
+  "Pon primero la URL del servicio push.": "Set the push service URL first.",
+  "Permiso de notificaciones denegado": "Notification permission denied",
+  "No se pudo activar": "Could not enable",
+  "Aviso de prueba enviado": "Test notification sent",
+  "No se pudo enviar": "Could not send",
+  "El servicio push se arranca con: node server/push-server.mjs (en tu PC, junto a opencode).":
+    "Start the push service with: node server/push-server.mjs (on your PC, next to opencode).",
+  "⚠ El push necesita HTTPS o localhost. En LAN por HTTP el navegador no lo permite: usa el túnel https (QR).":
+    "⚠ Push needs HTTPS or localhost. Over plain HTTP on a LAN the browser does not allow it: use the https tunnel (QR).",
+  "En iPhone/iPad, Apple solo permite push a las webs **instaladas** en la pantalla de inicio. Instálala primero (ver arriba).":
+    "On iPhone/iPad, Apple only allows push for web apps **installed** on the home screen. Install it first (see above).",
+  "Este navegador no soporta Web Push.": "This browser does not support Web Push.",
   "Idioma": "Language",
   "Idioma de la interfaz": "Interface language",
 

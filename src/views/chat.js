@@ -9,6 +9,7 @@ import { h, renderMarkdown, timeAgo, toast, copiarTexto } from "../ui/dom.js";
 import { Client, subscribeEvents } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 import { crearControles } from "../ui/chat-controls.js";
+import { registrarAtajos } from "../ui/atajos.js";
 import { t } from "../i18n.js";
 
 export async function chatView(params, root, signal) {
@@ -33,6 +34,7 @@ export async function chatView(params, root, signal) {
     type: "search",
     class: "buscar-chat",
     placeholder: t("Buscar en la conversación…"),
+    title: t("Buscar en la conversación…") + " (Ctrl+K)",
     autocomplete: "off",
     spellcheck: "false",
     hidden: true,
@@ -198,6 +200,23 @@ export async function chatView(params, root, signal) {
       buscarChat.hidden = true;
     }
   });
+
+  /* Atajos de teclado (solo escritorio): Ctrl/Cmd+K abre el buscador de la
+     conversacion, Escape lo cierra. En movil no se registran. */
+  const quitarAtajos = registrarAtajos({
+    buscar: () => {
+      buscarChat.hidden = false;
+      buscarChat.focus();
+      buscarChat.select?.();
+    },
+    cerrar: () => {
+      if (buscarChat.hidden) return;
+      buscarChat.value = "";
+      aplicarBusquedaChat();
+      buscarChat.hidden = true;
+    },
+  });
+  signal.addEventListener("abort", quitarAtajos);
 
   /* Adjuntos pendientes de enviar (chips sobre el composer) */
   const adjuntos = [];

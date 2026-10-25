@@ -5,6 +5,7 @@ import { Client } from "../api/client.js";
 import { navigate } from "../ui/router.js";
 import { t } from "../i18n.js";
 import { filtrarSesiones, proyectosUnicos, nombresDeProyectos } from "../ui/sesiones-filtro.js";
+import { registrarAtajos } from "../ui/atajos.js";
 
 const LAST_DIR_KEY = "ocmovil.lastDir";
 const ORDEN_KEY = "ocmovil.ordenSesiones";
@@ -46,6 +47,7 @@ export async function sessionsView(_params, root, signal) {
     type: "search",
     class: "buscar",
     placeholder: t("Buscar sesión…"),
+    title: t("Buscar sesión…") + " (Ctrl+K)",
     autocomplete: "off",
     spellcheck: "false",
   });
@@ -314,4 +316,18 @@ export async function sessionsView(_params, root, signal) {
     if (!document.hidden) refresh();
   }, 10000);
   signal.addEventListener("abort", () => clearInterval(iv));
+
+  // Ctrl/Cmd+K enfoca el buscador (solo escritorio); Escape lo limpia
+  const quitarAtajos = registrarAtajos({
+    buscar: () => {
+      buscar.focus();
+      buscar.select?.();
+    },
+    cerrar: () => {
+      if (!buscar.value) return;
+      buscar.value = "";
+      pintarLista(todas);
+    },
+  });
+  signal.addEventListener("abort", quitarAtajos);
 }

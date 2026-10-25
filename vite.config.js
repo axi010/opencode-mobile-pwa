@@ -59,9 +59,14 @@ function cspProduccion() {
 // localhost, en LAN y a traves del tunel. El cliente activa este modo con
 // `sameOrigin` en su config (ver src/config.js y src/api/client.js).
 const API_OPENCODE = "http://127.0.0.1:28894";
+const API_PUSH = "http://127.0.0.1:8099";
 const proxy = {
   "/api": { target: API_OPENCODE, changeOrigin: true },
   "/auth": { target: API_OPENCODE, changeOrigin: true },
+  /* Servicio de Web Push (server/push-server.mjs). Se proxya igual que la API
+     para que el movil lo alcance por el MISMO tunel, sin exponer otro puerto.
+     En Ajustes -> Notificaciones se pone "/push" como URL del servicio. */
+  "/push": { target: API_PUSH, changeOrigin: true, rewrite: (p) => p.replace(/^\/push/, "") },
 };
 
 export default defineConfig({

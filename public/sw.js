@@ -3,8 +3,10 @@
    v2: caches versionados -> al cambiar la version se borran los viejos
    y la app se actualiza sola sin quedar con JS obsoleto.
    v3: + notificaciones (message -> showNotification, click -> abrir la PWA).
-   v4: nueva version de estilos y chat (copiar codigo, ir al final). */
-const CACHE = "ocmovil-v4";
+   v4: nueva version de estilos y chat (copiar codigo, ir al final).
+   v5: + Web Push real (push/pushsubscriptionchange) para avisar con la app
+       cerrada (necesita el servicio de server/push-server.mjs). */
+const CACHE = "ocmovil-v5";
 
 self.addEventListener("install", () => self.skipWaiting());
 
@@ -60,6 +62,42 @@ self.addEventListener("message", (e) => {
     badge: "./icon-192.png",
     data: { url: d.url || "./#/permissions" },
   });
+});
+
+/* ---- PUSH REAL (Web Push / VAPID) ----
+   A diferencia del mensaje de arriba, esto lo dispara el NAVEGADOR desde su
+   servicio push: llega aunque la app este CERRADA. Requiere que el usuario haya
+   activado las notificaciones y que haya un servicio (server/push-server.mjs)
+   enviando. El payload es JSON: { title, body, url, tag }. */
+self.addEventListener("push", (e) => {
+  let d = {};
+  try {
+    d = e.data ? e.data.json() : {};
+  } catch {
+    // payload no-JSON: se usa como texto plano
+    d = { body: (() => { try { return e.data.text(); } catch { return ""; } })() };
+  }
+  e.waitUntil(
+    self.registration.showNotification(d.title || "OpenCode Móvil", {
+      body: d.body || "",
+      tag: d.tag || "ocmovil",
+      renotify: true,
+      icon: "./icon-192.png",
+      badge: "./icon-192.png",
+      data: { url: d.url || "./#/permissions" },
+    })
+  );
+});
+
+/* El navegador rota las suscripciones: si el push service la invalida, hay que
+   volver a suscribirse. Se avisa a la pagina para que re-registre. */
+self.addEventListener("pushsubscriptionchange", (e) => {
+  e.waitUntil(
+    (async () => {
+      const clientes = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const c of clientes) c.postMessage({ type: "push-subscription-change" });
+    })()
+  );
 });
 
 /* Al pulsar la notificacion: enfocar una ventana abierta o abrir la PWA. */
