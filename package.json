@@ -17,6 +17,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
+    "demo": "vite preview --outDir demo --port 4174",
     "test": "node --test \"test/**/*.test.js\"",
     "push": "node server/push-server.mjs"
   },

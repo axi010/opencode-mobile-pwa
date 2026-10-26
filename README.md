@@ -138,6 +138,9 @@ npm install
 # Development (hot reload), reachable from your LAN:
 npm run dev            # http://localhost:5173
 
+# Just want to see the UI? Prebuilt demo with fake data, no opencode needed:
+npm run demo           # http://localhost:4174
+
 # Production build + serve (with the /api proxy the app needs):
 npm run build
 npm run preview        # http://localhost:4173
@@ -232,8 +235,12 @@ npm test
 - 🟢 **New here?** Check the pinned issues
   [**👋 Ideas para colaborar**](https://github.com/axi010/opencode-mobile-pwa/issues/1)
   (easy tasks) and the [**🗺️ Roadmap**](https://github.com/axi010/opencode-mobile-pwa/issues/2).
+- ⚡ **Start in 2 minutes**: `npm install && npm run demo` — fake data, no
+  opencode server needed. Perfect for UI, CSS, accessibility and translation work.
 - 📖 Read [**CONTRIBUTING.md**](CONTRIBUTING.md) for the setup and the two hard
   design rules (no UI framework, no inline scripts/styles).
+- 🏅 Every merged contribution gets your name in [**CONTRIBUTORS.md**](CONTRIBUTORS.md)
+  and a mention in the release notes.
 - 🐛 Found a bug? Open an issue — there is a template for it.
 - 💡 Have an idea? Use the **Feature request** template (explain the *problem* first).
 - 🔒 Security problem? **Do not open a public issue** — see [SECURITY.md](SECURITY.md).

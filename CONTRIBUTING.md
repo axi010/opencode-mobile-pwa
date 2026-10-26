@@ -14,19 +14,37 @@ Thanks for your interest in improving **OpenCode Móvil**! 🎉
 - The app targets the **real opencode HTTP API**. Behaviour is verified against a
   running server, not mocked.
 
-## Development setup
+## See the app first (no opencode needed) ⚡
+
+You do **not** need opencode installed to work on the UI. The repo ships a
+prebuilt demo bundle with fake data:
 
 ```bash
 git clone https://github.com/axi010/opencode-mobile-pwa
 cd opencode-mobile-pwa
 npm install
-
-npm run dev        # http://localhost:5173
-npm run build      # production build (strict CSP injected)
-npm run preview    # serves dist/ with the /api proxy -> http://localhost:4173
+npm run demo       # http://localhost:4174 — fake data, nothing to configure
 ```
 
-You need a running **opencode** server on `127.0.0.1:28894` to test the app.
+That is the fastest way to start: every screen, both themes, no server, no
+account. Most UI, CSS, accessibility and i18n work can be done and reviewed
+entirely in demo mode.
+
+You only need a real opencode server when the change touches the **API layer**
+(`src/api/`), streaming (SSE), auth or Web Push.
+
+## Development setup
+
+```bash
+npm run dev        # http://localhost:5173  (live reload, needs opencode server)
+npm run demo       # http://localhost:4174  (prebuilt bundle, fake data)
+npm run build      # production build (strict CSP injected)
+npm run preview    # serves dist/ with the /api proxy -> http://localhost:4173
+npm test           # unit tests (node --test)
+```
+
+To test the real API you need a running **opencode** server on
+`127.0.0.1:28894` (`npm run dev` proxies `/api` and `/auth` to it).
 
 ## Code guidelines
 
