@@ -351,6 +351,7 @@ cd opencode-mobile
 npm install
 
 npm run dev            # desarrollo, accesible desde tu LAN (http://localhost:5173)
+npm run demo           # ver la UI con datos falsos, SIN servidor opencode (:4174)
 npm run build          # build de producción
 npm run preview        # sirve el build con el proxy /api (http://localhost:4173)
 npm test               # tests unitarios (runner nativo de Node, sin dependencias)
@@ -412,8 +413,12 @@ de leer y fácil de tocar.
 - 🟢 **¿Nuevo por aquí?** Mira los issues fijados
   [**👋 Ideas para colaborar**](https://github.com/axi010/opencode-mobile-pwa/issues/1)
   (tareas fáciles) y el [**🗺️ Roadmap**](https://github.com/axi010/opencode-mobile-pwa/issues/2).
+- ⚡ **Empieza en 2 minutos**: `npm install && npm run demo` — datos falsos, **sin
+  servidor opencode**. Perfecto para trabajar en UI, CSS, accesibilidad y traducciones.
 - 📖 Lee [**CONTRIBUTING.md**](CONTRIBUTING.md) para el setup y las dos reglas de
   diseño (sin framework de UI, sin scripts/estilos en línea).
+- 🏅 Cada contribución mezclada lleva tu nombre en [**CONTRIBUTORS.md**](CONTRIBUTORS.md)
+  y una mención en las notas de la versión.
 - 🐛 ¿Un fallo? Abre un *issue* (hay plantilla).
 - 💡 ¿Una idea? Usa la plantilla **Feature request** (explica el *problema* antes).
 - 🔒 ¿Problema de seguridad? **No abras un issue público** — mira [SECURITY.md](SECURITY.md).
