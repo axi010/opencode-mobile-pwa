@@ -10,10 +10,8 @@ or a review that improved the code.
 
 ## Everyone else
 
-<!-- Añade tu nombre cuando tu PR se mezcle. Formato:
-     - **Nombre** ([@usuario](https://github.com/usuario)) — qué hiciste -->
-
-_No external contributors yet — this list is waiting for you._ 👀
+- **Kamelio0815** ([@Kamelio0815](https://github.com/Kamelio0815)) — German
+  translation (`src/i18n/de.js`, 260 strings).
 
 ---
 

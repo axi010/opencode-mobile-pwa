@@ -8,7 +8,14 @@
      t("Sesiones")                 -> traduce una cadena
      t("Hola {n}", { n: 3 })       -> sustituye {n}
    El idioma se detecta del navegador la primera vez y se guarda en
-   localStorage ("ocmovil.idioma"): "es" | "en". */
+   localStorage ("ocmovil.idioma"): "es" | "en" | "de".
+
+   Los diccionarios que no son el espanol viven en src/i18n/<codigo>.js y se
+   registran en DICCIONARIOS. Para anadir un idioma: crea el fichero con las
+   mismas claves que EN, importalo aqui y anadelo a IDIOMAS. El test
+   "diccionarios" comprueba que las claves coinciden. */
+
+import { DE } from "./i18n/de.js";
 
 const KEY = "ocmovil.idioma";
 
@@ -342,10 +349,15 @@ const EN = {
     "📲 To install it: Share → “Add to Home Screen”. That enables the PIN and notifications.",
 };
 
+/* Diccionarios por idioma. El espanol es el idioma fuente: sus cadenas son las
+   claves, asi que no tiene diccionario propio. */
+export const DICCIONARIOS = { en: EN, de: DE };
+
 /* Idiomas disponibles (para el selector de Ajustes). */
 export const IDIOMAS = [
   { id: "es", nombre: "Español" },
   { id: "en", nombre: "English" },
+  { id: "de", nombre: "Deutsch" },
 ];
 
 let idioma = "es";
@@ -354,11 +366,12 @@ let idioma = "es";
 export function initIdioma() {
   try {
     const guardado = localStorage.getItem(KEY);
-    if (guardado === "es" || guardado === "en") {
+    if (IDIOMAS.some((i) => i.id === guardado)) {
       idioma = guardado;
     } else {
       const nav = (navigator.language || "es").toLowerCase();
-      idioma = nav.startsWith("es") ? "es" : "en";
+      /* Coincidencia por prefijo: "de-AT" -> "de", "es-419" -> "es". */
+      idioma = IDIOMAS.map((i) => i.id).find((id) => nav.startsWith(id)) || "en";
     }
   } catch {
     idioma = "es";
@@ -372,7 +385,7 @@ export function getIdioma() {
 }
 
 export function setIdioma(nuevo) {
-  if (nuevo !== "es" && nuevo !== "en") return idioma;
+  if (!IDIOMAS.some((i) => i.id === nuevo)) return idioma;
   idioma = nuevo;
   try {
     localStorage.setItem(KEY, nuevo);
@@ -385,7 +398,8 @@ export function setIdioma(nuevo) {
 
 /* Traduce una cadena. `vars` sustituye los marcadores {clave}. */
 export function t(texto, vars) {
-  let out = idioma === "en" ? EN[texto] ?? texto : texto;
+  const dicc = DICCIONARIOS[idioma];
+  let out = dicc ? dicc[texto] ?? texto : texto;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       out = out.replaceAll(`{${k}}`, String(v));

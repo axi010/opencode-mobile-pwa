@@ -23,6 +23,13 @@ import {
   nombresDeProyectos,
 } from "../src/ui/sesiones-filtro.js";
 import { resolverAtajo } from "../src/ui/atajos.js";
+import {
+  IDIOMAS,
+  DICCIONARIOS,
+  t,
+  setIdioma,
+  getIdioma,
+} from "../src/i18n.js";
 
 /* ---------------- escapeHtml ---------------- */
 test("escapeHtml neutraliza los caracteres peligrosos", () => {
@@ -224,4 +231,71 @@ test("resolverAtajo no se rompe con entradas raras", () => {
 test("resolverAtajo ignora Enter (lo gestiona el textarea del chat)", () => {
   assert.equal(resolverAtajo(ev({ key: "Enter" })), null);
   assert.equal(resolverAtajo(ev({ key: "Enter", shiftKey: true })), null);
+});
+
+/* ---------------- i18n ---------------- */
+
+/* Un diccionario nuevo (p. ej. el aleman) debe tener EXACTAMENTE las mismas
+   claves que el ingles, que es el de referencia. Si falta una clave la app no se
+   rompe (cae al espanol), pero es una traduccion incompleta; si sobra, es una
+   clave que ya no existe en la app. */
+test("los diccionarios tienen las mismas claves que el de referencia", () => {
+  const ref = Object.keys(DICCIONARIOS.en).sort();
+  for (const { id } of IDIOMAS) {
+    if (id === "es") continue; /* el espanol no tiene diccionario: es la fuente */
+    const dicc = DICCIONARIOS[id];
+    assert.ok(dicc, `falta el diccionario de "${id}"`);
+    const claves = Object.keys(dicc).sort();
+    const faltan = ref.filter((k) => !claves.includes(k));
+    const sobran = claves.filter((k) => !ref.includes(k));
+    assert.deepEqual(faltan, [], `"${id}": faltan claves`);
+    assert.deepEqual(sobran, [], `"${id}": sobran claves`);
+  }
+});
+
+/* Los marcadores {n}, {nombre}... se sustituyen al vuelo: si una traduccion los
+   pierde o los escribe distinto, el texto sale con el hueco a la vista. */
+test("las traducciones conservan los marcadores {x} de la clave", () => {
+  const marcadores = (s) => (s.match(/\{\w+\}/g) || []).sort();
+  for (const { id } of IDIOMAS) {
+    const dicc = DICCIONARIOS[id];
+    if (!dicc) continue;
+    for (const [clave, valor] of Object.entries(dicc)) {
+      assert.deepEqual(
+        marcadores(valor),
+        marcadores(clave),
+        `"${id}" rompe los marcadores de: ${clave}`,
+      );
+    }
+  }
+});
+
+test("t() traduce al aleman y deja el espanol como fuente", () => {
+  setIdioma("es");
+  assert.equal(t("Cerrar"), "Cerrar");
+  setIdioma("de");
+  assert.equal(t("Cerrar"), "Schließen");
+  assert.equal(t("Ajustes"), "Einstellungen");
+  setIdioma("es");
+});
+
+test("t() cae al texto original si la clave no esta en el diccionario", () => {
+  setIdioma("de");
+  assert.equal(t("clave que no existe"), "clave que no existe");
+  setIdioma("es");
+});
+
+test("t() sustituye las variables en cualquier idioma", () => {
+  setIdioma("de");
+  const out = t("{n} peticiones del agente esperando tu decisión", { n: 7 });
+  assert.ok(out.includes("7"), "debe sustituir {n}");
+  assert.ok(!out.includes("{n}"), "no debe quedar {n} sin sustituir");
+  setIdioma("es");
+});
+
+test("setIdioma ignora los idiomas no soportados", () => {
+  setIdioma("en");
+  assert.equal(setIdioma("xx"), "en");
+  assert.equal(getIdioma(), "en");
+  setIdioma("es");
 });

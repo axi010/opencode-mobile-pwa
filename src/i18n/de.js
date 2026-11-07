@@ -217,7 +217,7 @@ export const DE = {
   "✅ Activas en este dispositivo.": "✅ Gerät freischalten.",
   "Desactivadas en este dispositivo.": "Dieses Gerät deaktivieren.",
   "No se pudo comprobar.": "Konnte nicht prüfen.",
-  "Guardar URL": "Speichere URL",s
+  "Guardar URL": "Speichere URL",
   "Activar push": "Push aktiviert",
   "Desactivar push": "Push deaktiviert",
   "Enviar prueba": "Sende Test",

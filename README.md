@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
 [![App dependencies](https://img.shields.io/badge/app%20dependencies-0-brightgreen.svg)](#-features)
-[![Tests](https://img.shields.io/badge/tests-27%20passing-brightgreen.svg)](#-tests)
+[![Tests](https://img.shields.io/badge/tests-33%20passing-brightgreen.svg)](#-tests)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
@@ -52,7 +52,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Search** inside a conversation (highlight + jump between matches) and **copy the whole chat as Markdown**.
 - **Session list with search, sorting and project filter** (recent / oldest / name; the project filter appears only when you have more than one project).
 - **System view**: MCP servers (connect/disconnect), model providers, plugins, skills and commands.
-- **Bilingual UI** (Spanish / English), auto-detected from your browser.
+- **Multilingual UI** (Spanish / English / German), auto-detected from your browser — [add your language](https://github.com/axi010/opencode-mobile-pwa/issues/7).
 - **Resilient connection**: the event stream reconnects with **exponential back-off** (1 s → 30 s + jitter).
 - **Permission control**: approve or reject what the agent asks for (**once / always / reject**), right from your phone. Live banner in the chat, badge counter in the session list and a dedicated screen.
 - **Plan / Build mode switch**: flip the agent's mode with one tap.
@@ -63,7 +63,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
 - **Keyboard shortcuts** (desktop): `Ctrl/Cmd+K` to search, `Enter` to send, `Shift+Enter` for a line break, `Esc` to close.
 - **Local notifications** when the agent needs a permission while you are not looking at the app.
 - **Real push notifications** (Web Push / VAPID): they arrive **with the app closed**. Includes a tiny push service (`server/push-server.mjs`) you run next to opencode — no third party involved.
-- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~32 kB gzipped (JS + CSS).
+- **No frameworks**: vanilla JS + a ~20-line DOM helper. ~37 kB gzipped (JS + CSS).
 
 ## 📱 Platform support
 
@@ -213,11 +213,12 @@ opencode-mobile/
 
 ## 🧪 Tests
 
-**27 unit tests** cover the logic without a DOM: **markdown rendering** (safe
+**33 unit tests** cover the logic without a DOM: **markdown rendering** (safe
 escaping, code blocks, lists), `timeAgo`, the **path utilities** of the file
 browser (which must work against an opencode server on Windows, macOS and Linux),
-and the **session filter** (project / text / sort). They use **Node's built-in
-test runner**, so they add **no dependencies**:
+the **session filter** (project / text / sort) and **i18n** (every dictionary must
+have the same keys as the reference one, with its `{x}` placeholders intact). They
+use **Node's built-in test runner**, so they add **no dependencies**:
 
 ```bash
 npm test
@@ -266,7 +267,7 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Buscar dentro de la conversación** (resalta y salta entre coincidencias) y **copiar todo el chat en Markdown**.
 - **Lista de sesiones con buscador, orden y filtro por proyecto** (recientes / antiguas / nombre; el filtro por proyecto aparece solo si tienes más de uno).
 - **Vista Sistema**: servidores MCP (conectar/desconectar), proveedores de modelos, plugins, skills y comandos.
-- **Interfaz bilingüe** (español / inglés), detectada automáticamente del navegador.
+- **Interfaz multiidioma** (español / inglés / alemán), detectada automáticamente del navegador — [añade tu idioma](https://github.com/axi010/opencode-mobile-pwa/issues/7).
 - **Conexión resistente**: el stream se reconecta con **backoff exponencial** (1 s → 30 s + jitter).
 - **Control de permisos**: aprueba o rechaza lo que pide el agente (**una vez / siempre / rechazar**) desde el móvil. Banner en vivo en el chat, contador en la lista de sesiones y pantalla propia.
 - **Conmutador Plan / Build**: cambia el modo del agente con un toque.
@@ -277,7 +278,7 @@ Un **cliente PWA para móvil** que te permite manejar tu servidor [opencode](htt
 - **Atajos de teclado** (escritorio): `Ctrl/Cmd+K` para buscar, `Enter` para enviar, `Shift+Enter` para salto de línea y `Esc` para cerrar.
 - **Notificaciones locales** cuando el agente pide un permiso y no estás mirando la app.
 - **Notificaciones push reales** (Web Push / VAPID): llegan con la **app cerrada**. Incluye un servicio push mínimo (`server/push-server.mjs`) que corres junto a opencode, sin depender de terceros.
-- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 32 kB comprimidos (JS + CSS).
+- **Sin frameworks**: JS vanilla + un helper DOM de ~20 líneas. Unos 37 kB comprimidos (JS + CSS).
 
 ## 📱 Compatibilidad de plataformas
 
@@ -390,11 +391,12 @@ La API de opencode solo permite CORS desde loopback, así que la PWA habla con `
 
 ## 🧪 Tests
 
-**27 pruebas** cubren la lógica sin DOM: el **render de markdown** (escape seguro,
+**33 pruebas** cubren la lógica sin DOM: el **render de markdown** (escape seguro,
 bloques de código, listas), `timeAgo`, las **utilidades de rutas** del explorador
-(deben funcionar con el servidor opencode en Windows, macOS y Linux) y el
-**filtro de sesiones** (proyecto / texto / orden). Usan el **runner nativo de
-Node**: **no añaden dependencias**.
+(deben funcionar con el servidor opencode en Windows, macOS y Linux), el
+**filtro de sesiones** (proyecto / texto / orden) y la **i18n** (cada diccionario
+debe tener las mismas claves que el de referencia y conservar sus marcadores `{x}`).
+Usan el **runner nativo de Node**: **no añaden dependencias**.
 
 ```bash
 npm test
