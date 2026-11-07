@@ -235,21 +235,28 @@ test("resolverAtajo ignora Enter (lo gestiona el textarea del chat)", () => {
 
 /* ---------------- i18n ---------------- */
 
-/* Un diccionario nuevo (p. ej. el aleman) debe tener EXACTAMENTE las mismas
-   claves que el ingles, que es el de referencia. Si falta una clave la app no se
-   rompe (cae al espanol), pero es una traduccion incompleta; si sobra, es una
-   clave que ya no existe en la app. */
-test("los diccionarios tienen las mismas claves que el de referencia", () => {
+/* Idiomas que estan traducidos al 100 %. El resto puede estar a medias: las
+   claves que falten caen al espanol (nunca dejan un hueco). Cuando un idioma se
+   complete, se anade aqui. */
+const IDIOMAS_COMPLETOS = ["en", "de"];
+
+/* Un diccionario nuevo debe tener las mismas claves que el ingles, que es el de
+   referencia. Sobrar una clave siempre es un error (es una cadena que ya no
+   existe en la app); faltarla solo se exige en los idiomas completos, porque una
+   traduccion a medias es bienvenida (issue #7). */
+test("los diccionarios no tienen claves que no existan en el de referencia", () => {
   const ref = Object.keys(DICCIONARIOS.en).sort();
   for (const { id } of IDIOMAS) {
     if (id === "es") continue; /* el espanol no tiene diccionario: es la fuente */
     const dicc = DICCIONARIOS[id];
     assert.ok(dicc, `falta el diccionario de "${id}"`);
     const claves = Object.keys(dicc).sort();
-    const faltan = ref.filter((k) => !claves.includes(k));
     const sobran = claves.filter((k) => !ref.includes(k));
-    assert.deepEqual(faltan, [], `"${id}": faltan claves`);
     assert.deepEqual(sobran, [], `"${id}": sobran claves`);
+    if (IDIOMAS_COMPLETOS.includes(id)) {
+      const faltan = ref.filter((k) => !claves.includes(k));
+      assert.deepEqual(faltan, [], `"${id}" esta marcado como completo: faltan claves`);
+    }
   }
 });
 
