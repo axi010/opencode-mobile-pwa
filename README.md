@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
 [![App dependencies](https://img.shields.io/badge/app%20dependencies-0-brightgreen.svg)](#-features)
-[![Tests](https://img.shields.io/badge/tests-33%20passing-brightgreen.svg)](#-tests)
+[![Tests](https://img.shields.io/badge/tests-35%20passing-brightgreen.svg)](#-tests)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
@@ -213,7 +213,7 @@ opencode-mobile/
 
 ## 🧪 Tests
 
-**33 unit tests** cover the logic without a DOM: **markdown rendering** (safe
+**35 unit tests** cover the logic without a DOM: **markdown rendering** (safe
 escaping, code blocks, lists), `timeAgo`, the **path utilities** of the file
 browser (which must work against an opencode server on Windows, macOS and Linux),
 the **session filter** (project / text / sort) and **i18n** (every dictionary must
@@ -391,7 +391,7 @@ La API de opencode solo permite CORS desde loopback, así que la PWA habla con `
 
 ## 🧪 Tests
 
-**33 pruebas** cubren la lógica sin DOM: el **render de markdown** (escape seguro,
+**35 pruebas** cubren la lógica sin DOM: el **render de markdown** (escape seguro,
 bloques de código, listas), `timeAgo`, las **utilidades de rutas** del explorador
 (deben funcionar con el servidor opencode en Windows, macOS y Linux), el
 **filtro de sesiones** (proyecto / texto / orden) y la **i18n** (cada diccionario

@@ -306,3 +306,22 @@ test("setIdioma ignora los idiomas no soportados", () => {
   assert.equal(getIdioma(), "en");
   setIdioma("es");
 });
+
+test("t() devuelve el valor ingles tras setIdioma('en')", () => {
+  setIdioma("en");
+  assert.equal(t("Sesiones"), "Sessions");
+  assert.equal(t("Ajustes"), "Settings");
+  setIdioma("es");
+  assert.equal(t("Sesiones"), "Sesiones");
+});
+
+/* Higiene: un valor vacio, con solo espacios o que no sea string dejaria un
+   hueco en la interfaz, que es justo lo que el diseno quiere evitar. */
+test("ningun diccionario tiene valores vacios ni de otro tipo", () => {
+  for (const [id, dicc] of Object.entries(DICCIONARIOS)) {
+    for (const [clave, valor] of Object.entries(dicc)) {
+      assert.equal(typeof valor, "string", `"${id}": el valor de "${clave}" no es string`);
+      assert.notEqual(valor.trim(), "", `"${id}": el valor de "${clave}" esta vacio`);
+    }
+  }
+});
