@@ -25,7 +25,8 @@
 <p align="center">
   <img src="screenshots/sessions.png" width="250" alt="Sessions list with search and sort" />
   <img src="screenshots/chat.png" width="250" alt="Chat with permissions banner, Plan/Build switch and model picker" />
-  <img src="screenshots/permissions.png" width="250" alt="Approve or reject agent permissions" />
+  <img src="screenshots/permissions.png" width="250" alt="Approve or reject agent permissions" /><img src="screenshots/settings.png" width="250" alt="Settings: theme, language, security and notifications" />
+
 </p>
 
 A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) server from your phone: chat with your sessions in real time, approve permissions, pick the model, browse your project's files and attach them, all from a tiny, dependency-free client.
@@ -42,6 +43,7 @@ A **mobile Progressive Web App** to drive your [opencode](https://opencode.ai) s
   <img src="screenshots/sessions.png" width="250" alt="Lista de sesiones con buscador y orden" />
   <img src="screenshots/chat.png" width="250" alt="Chat con banner de permisos, Plan/Build y selector de modelo" />
   <img src="screenshots/permissions.png" width="250" alt="Aprobar o rechazar permisos del agente" />
+  <img src="screenshots/settings.png" width="250" alt="Ajustes: tema, idioma, seguridad y notificaciones" />
 </p>
 
 ---
