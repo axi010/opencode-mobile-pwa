@@ -548,6 +548,14 @@ select:focus { outline: none; border-color: var(--accent); }
   cursor: pointer;
   padding-top: 4px;
 }
+/* `.sec label` (linea 477) es mas especifica que `.fila-toggle` y le imponia
+   flex-direction: column: el checkbox salia solo, centrado encima del texto.
+   Se repite aqui con especificidad suficiente para recuperar la fila. */
+.sec label.fila-toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
 .fila-toggle input[type="checkbox"] {
   width: 20px;
   height: 20px;
