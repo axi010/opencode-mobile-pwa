@@ -232,7 +232,11 @@ const servidor = createServer(async (req, res) => {
     }
     return json(res, 404, { error: "no encontrado" });
   } catch (e) {
-    return json(res, 500, { error: String(e?.message || e) });
+    // No exponer el mensaje del error al cliente (CodeQL: information
+    // exposure through a stack trace / exception). El detalle queda en el log
+    // del servidor para depurar sin filtrar internals.
+    console.error("  error en la peticion:", e?.message || e);
+    return json(res, 500, { error: "error interno" });
   }
 });
 
