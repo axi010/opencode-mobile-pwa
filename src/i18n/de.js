@@ -11,7 +11,7 @@ export const DE = {
   "Prueba: así se verá el aviso de un permiso pendiente.":
     "Test: So sieht eine Warnung aus, wenn auf Berechtigungen gewartet wird.",
   "Cargando…": "Lade…",
-  "Copiar": "Copy",
+  "Copiar": "Kopieren",
   "Copiado": "Kopieren",
   "No se pudo": "Fehlgeschlagen",
   "ahora": "jetzt",
@@ -33,8 +33,8 @@ export const DE = {
   "Probar": "Test",
   "Sí": "Ja",
   "No": "Nein",
-  "Sesiones": "Sessions",
-  "Sesión": "Session",
+  "Sesiones": "Sitzungen",
+  "Sesión": "Sitzung",
   "Chat": "Chat",
   "Permisos": "Berechtigungen",
   "Permiso": "Berechtigung",
@@ -176,10 +176,10 @@ export const DE = {
   "minutos": "Minuten",
   "Bloquear ahora": "Jetzt sperren",
   "Bloqueado": "Gesperrt",
-  "Desactivar PIN": "Turn off PIN",
-  "¿Desactivar el PIN de este dispositivo?": "Turn off the PIN on this device?",
-  "PIN desactivado": "PIN turned off",
-  "PIN activado · se pedirá al abrir la app": "PIN enabled · it will be asked when opening the app",
+  "Desactivar PIN": "PIN deaktivieren",
+  "¿Desactivar el PIN de este dispositivo?": "PIN auf diesem Gerät deaktivieren?",
+  "PIN desactivado": "PIN deaktiviert",
+  "PIN activado · se pedirá al abrir la app": "PIN aktiviert · wird abgefragt, wenn die App geöffnet wird",
   "PIN demasiado corto (mínimo 4)": "PIN zu kurz (mindestens 4 Zeichen)",
   "Activar PIN": "Schalte PIN an",
   "Nuevo PIN": "Neuer PIN",
@@ -209,7 +209,7 @@ export const DE = {
   "En macOS, usa Cmd en lugar de Ctrl.": "Verwende auf maOS Cmd anstatt Ctrl.",
 
   /* ---- push ---- */
-  "Notificaciones push (app cerrada)": "Push notifications (app closed)",
+  "Notificaciones push (app cerrada)": "Push-Benachrichtigungen (App geschlossen)",
   "A diferencia de las de arriba, estas llegan con la app CERRADA. Necesitan el servicio push corriendo en tu PC (server/push-server.mjs) y su URL aquí.":
     "Anders als die darüber, kommen diese mit App CLOSE an. Hierfür muss der Push Service auf dem Rechner laufen (server/push-server.mjs).",
   "URL del servicio push": "Push Service URL",
@@ -258,7 +258,7 @@ export const DE = {
     "Vom Browser blockiert. Aktiviere diese in den Site Einstellungen (Icon neben der URL) und starte erneut.",
   "Desactivadas.": "Deaktiviert.",
   "Activar notificaciones": "Aktiviere Benachichtigungen",
-  "Notificaciones activadas": "Notifications enabled",
+  "Notificaciones activadas": "Benachrichtigungen aktiviert",
   "Permiso denegado en el navegador": "Zugriff im Browser verweigert",
   "Permiso no concedido": "Zugriff nicht freigeschltet",
   "Probar notificación": "Test Benachichtigung",
@@ -272,12 +272,12 @@ export const DE = {
   "Proveedores de modelos": "Modell Anbieter",
   "Plugins": "Plugins",
   "Skills": "Skills",
-  "Comandos": "Commands",
-  "Servidores de lenguaje (LSP)": "Language servers (LSP)",
+  "Comandos": "Befehle",
+  "Servidores de lenguaje (LSP)": "Sprachserver (LSP)",
   "La API HTTP de opencode no expone el estado de los LSP: los gestiona el servidor internamente (según los ficheros de tu proyecto). Aquí no hay nada que configurar.":
     "Die opencode API bietet keine  LSP Status: der Server behandelt diese intern (anhängig von deinen Projketdateien). Hier kann nichts konfiguriert werden.",
   "Estado de los servicios del servidor: MCP, proveedores, plugins, skills y comandos.":
-    "Status Server Service: MCP, Provider, Plugins, Skills und Commands.",
+    "Status Server Service: MCP, Provider, Plugins, Skills und Befehle.",
   "Ver sistema": "Ansichtssystem",
   "activo": "Active",
   "inactivo": "Inaktive",
@@ -290,12 +290,12 @@ export const DE = {
   "Sin proveedores.": "Keine Anbieter.",
   "Sin plugins.": "Keine Plugins.",
   "Sin skills.": "Kein Skills.",
-  "Sin comandos.": "Keine Commands.",
+  "Sin comandos.": "Keine Befehle.",
   "Error cargando MCP": "Fehler beim Laden von MCP",
   "Error cargando proveedores": "Fehler beim Laden der Provider",
   "Error cargando plugins": "Fehler beim Laden der Plugins",
   "Error cargando skills": "Fehler beim Laden der Skills",
-  "Error cargando comandos": "Fehler beim Laden der Commands",
+  "Error cargando comandos": "Fehler beim Laden der Befehle",
   "origen: {tipo}": "Quelle: {tipo}",
 
   /* ---- ajustes: diagnostico / acerca de ---- */
@@ -310,7 +310,7 @@ export const DE = {
     "OpenCode Móvil · framework-free PWA (Vite + vanilla JS). Client für die opencode HTTP API: Sessions, Streaming chat, Berechtigungen und PIN Sperre.",
 
   /* ---- bloqueo con PIN ---- */
-  "Bloqueado": "Locked",
+  "Bloqueado": "Gesperrt",
   "Introduce el PIN del dispositivo": "Geräte PIN eingeben",
   "Desbloquear": "Entsperren",
   "Comprobando…": "Prüfe…",
@@ -319,7 +319,7 @@ export const DE = {
   "Se borraran el PIN y la contraseña guardada en este dispositivo. ¿Continuar?":
     "Der Pin und das gespeicherte Passwort auf diesem Gerät werden gelöscht. Fortsetzen?",
   "Bloqueado por inactividad": "Wegen Inaktivität gesperrt",
-  "Bloqueado: la app paso a segundo plano": "Gepserrt: die App läuft im Hintergrund weiter",
+  "Bloqueado: la app paso a segundo plano": "Gesperrt: die App läuft im Hintergrund weiter",
   "PIN incorrecto ({n}º intento)": "Falscher PIN ({n}-er Versuch)",
   "Demasiados intentos: espera {s} s": "Zu viele Versuche: warte {s} s",
   "Error comprobando el PIN": "Fehler beim Prüfen der PIN",
