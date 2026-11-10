@@ -12,6 +12,8 @@ or a review that improved the code.
 
 - **Kamelio0815** ([@Kamelio0815](https://github.com/Kamelio0815)) — German
   translation (`src/i18n/de.js`, 260 strings).
+- **mrCabez** ([@mrCabez](https://github.com/mrCabez)) — Italian
+  translation (`src/i18n/it.js`, 260 strings).
 
 ---
 

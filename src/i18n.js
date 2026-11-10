@@ -8,7 +8,7 @@
      t("Sesiones")                 -> traduce una cadena
      t("Hola {n}", { n: 3 })       -> sustituye {n}
    El idioma se detecta del navegador la primera vez y se guarda en
-   localStorage ("ocmovil.idioma"): "es" | "en" | "de".
+   localStorage ("ocmovil.idioma"): "es" | "en" | "de" | "it".
 
    Los diccionarios que no son el espanol viven en src/i18n/<codigo>.js y se
    registran en DICCIONARIOS. Para anadir un idioma: crea el fichero con las
@@ -16,6 +16,7 @@
    "diccionarios" comprueba que las claves coinciden. */
 
 import { DE } from "./i18n/de.js";
+import { IT } from "./i18n/it.js";
 
 const KEY = "ocmovil.idioma";
 
@@ -351,13 +352,14 @@ const EN = {
 
 /* Diccionarios por idioma. El espanol es el idioma fuente: sus cadenas son las
    claves, asi que no tiene diccionario propio. */
-export const DICCIONARIOS = { en: EN, de: DE };
+export const DICCIONARIOS = { en: EN, de: DE, it: IT };
 
 /* Idiomas disponibles (para el selector de Ajustes). */
 export const IDIOMAS = [
   { id: "es", nombre: "Español" },
   { id: "en", nombre: "English" },
   { id: "de", nombre: "Deutsch" },
+  { id: "it", nombre: "Italiano" },
 ];
 
 let idioma = "es";

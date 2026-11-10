@@ -238,7 +238,7 @@ test("resolverAtajo ignora Enter (lo gestiona el textarea del chat)", () => {
 /* Idiomas que estan traducidos al 100 %. El resto puede estar a medias: las
    claves que falten caen al espanol (nunca dejan un hueco). Cuando un idioma se
    complete, se anade aqui. */
-const IDIOMAS_COMPLETOS = ["en", "de"];
+const IDIOMAS_COMPLETOS = ["en", "de", "it"];
 
 /* Un diccionario nuevo debe tener las mismas claves que el ingles, que es el de
    referencia. Sobrar una clave siempre es un error (es una cadena que ya no
