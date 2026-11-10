@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![No frameworks](https://img.shields.io/badge/frameworks-none-brightgreen.svg)](#-features)
 [![App dependencies](https://img.shields.io/badge/app%20dependencies-0-brightgreen.svg)](#-features)
-[![Tests](https://img.shields.io/badge/tests-35%20passing-brightgreen.svg)](#-tests)
+[![CI](https://github.com/axi010/opencode-mobile-pwa/actions/workflows/ci.yml/badge.svg)](https://github.com/axi010/opencode-mobile-pwa/actions/workflows/ci.yml) [![Tests](https://img.shields.io/badge/tests-35%20passing-brightgreen.svg)](#-tests)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8.svg)](#-features)
 [![GitHub stars](https://img.shields.io/github/stars/axi010/opencode-mobile-pwa?style=social)](https://github.com/axi010/opencode-mobile-pwa/stargazers)
 
